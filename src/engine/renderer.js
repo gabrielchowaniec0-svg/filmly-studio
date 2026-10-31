@@ -3,6 +3,9 @@ import { drawShape, trs, mul, IDENT } from './paint.js';
 import { drawRig, poseAt, applyOverrides, holdTime } from './rig.js';
 import { actorState, captionsAt, cameraAt, windowsAt, STAGE_W, STAGE_H } from './timeline.js';
 import { TRANSITIONS } from '../assets/transitions/index.js';
+import { heldBy, effectsAt } from './timeline.js';
+import { scenePropsAt, drawFreeProp, drawActorWithProps } from './props.js';
+import { EFFECTS } from '../assets/effects/index.js';
 
 /**
  * assets = { rigs:{id:rig}, characters:{id:char}, scenes:{id:scene} }
@@ -55,45 +58,100 @@ function drawScene(ctx, film, assets, scene, lt) {
 
   for (const layer of bg.layers) drawShape(ctx, layer, null, null);
 
-  // actors, back to front
-  const states = [];
+  // actors and props, back to front (props marked `back` first, `front` last)
+  const frames = new Map();
+  const frameOf = (name, time) => {
+    const key = name + '@' + time;
+    if (!frames.has(key)) frames.set(key, scene.cast[name] ? actorFrame(film, assets, scene, bg, name, time) : null);
+    return frames.get(key);
+  };
+  const props = scene.propOrder && scene.propOrder.length ? scenePropsAt(scene, assets, lt, bg, frameOf) : null;
+  const items = [];
   scene.castOrder.forEach((name, idx) => {
-    const st = actorState(scene, name, lt);
-    if (st.visible) states.push({ name, st, idx });
+    const af = frameOf(name, lt);
+    if (af.st.visible) items.push({ y: af.st.y, rank: 1, idx, af });
   });
-  states.sort((a, b) => a.st.y - b.st.y || a.idx - b.idx);
-  for (const { name, st } of states) {
-    const c = scene.cast[name];
-    const char = (film.characters && film.characters[c.char]) || assets.characters[c.char];
-    const rig = assets.rigs[char.rig];
-    const layers = [];
-    for (const L of st.layers) {
-      const clip = rig.clips[L.clip] || (layers.length ? null : rig.clips.idle);
-      if (!clip) continue;
-      layers.push({ clip, t: L.hold != null ? holdTime(clip, L.t, L.hold) : L.t, weight: L.weight });
-    }
-    const pose = applyOverrides(poseAt(layers), { gaze: { pos: st.gaze } });
-    pose.lidN = { ...(pose.lidN || {}), scale: [1, st.lid] };
-    pose.lidF = { ...(pose.lidF || {}), scale: [1, st.lid] };
-    const depthScale = 1 + st.y * 0.002;
-    const s = (char.scale || 1) * (c.scale || 1) * (rig.displayScale || 0.85) * depthScale;
-    const floor = bg.floorY + st.y * 2;
-    const placement = trs(st.x, floor, 0, s * st.turn, s);
-    // soft contact shadow (shrinks when airborne)
-    const lift = -(pose.root?.pos?.[1] || 0);
-    const k = Math.max(0.4, 1 - lift / 260);
-    ctx.save();
-    ctx.globalAlpha = 0.22 * k;
-    ctx.fillStyle = '#000';
-    ctx.beginPath();
-    ctx.ellipse(st.x, floor + 4, 64 * s * k, 13 * s * k, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-    drawRig(ctx, rig, char, pose, st.face, placement);
+  if (props) props.free.forEach((P, idx) => items.push({ y: P.y, rank: P.back ? 0 : P.front ? 2 : 1, idx: -1000 + idx, P }));
+  items.sort((a, b) => a.rank - b.rank || a.y - b.y || a.idx - b.idx);
+  for (const it of items) {
+    if (it.P) { drawFreeProp(ctx, it.P); continue; }
+    const af = it.af;
+    const held = props?.held[af.name];
+    if (held) drawActorWithProps(ctx, af, held, () => drawActor(ctx, af));
+    else drawActor(ctx, af);
   }
   ctx.restore();
 
+  drawEffects(ctx, scene, lt, frameOf);
   drawCaptions(ctx, captionsAt(scene, lt));
+}
+
+/** Everything needed to draw (or attach props to) one actor at scene time lt. */
+function actorFrame(film, assets, scene, bg, name, lt) {
+  const st = actorState(scene, name, lt);
+  const c = scene.cast[name];
+  const char = (film.characters && film.characters[c.char]) || assets.characters[c.char];
+  const rig = assets.rigs[char.rig];
+  const layers = [];
+  for (const L of st.layers) {
+    const clip = rig.clips[L.clip] || (layers.length ? null : rig.clips.idle);
+    if (!clip) continue;
+    layers.push({ clip, t: L.hold != null ? holdTime(clip, L.t, L.hold) : L.t, weight: L.weight });
+  }
+  const pose = applyOverrides(poseAt(layers), { gaze: { pos: st.gaze } });
+  pose.lidN = { ...(pose.lidN || {}), scale: [1, st.lid] };
+  pose.lidF = { ...(pose.lidF || {}), scale: [1, st.lid] };
+  if (scene.propOrder && scene.propOrder.length) {
+    // a hand holding a prop closes into a fist (or stays open for trays, plates…)
+    const h = heldBy(scene, name, lt);
+    for (const hand of ['F', 'N']) {
+      if (!h[hand]) continue;
+      const def = assets.props?.[scene.props[h[hand]].prop];
+      pose.__slots = { ...(pose.__slots || {}), ['hand' + hand]: def?.handPose || 'fist' };
+    }
+  }
+  const depthScale = 1 + st.y * 0.002;
+  const s = (char.scale || 1) * (c.scale || 1) * (rig.displayScale || 0.85) * depthScale;
+  const floor = bg.floorY + st.y * 2;
+  const placement = trs(st.x, floor, 0, s * st.turn, s);
+  return { name, st, c, char, rig, pose, s, floor, placement, bg, mats: null };
+}
+
+function drawActor(ctx, af) {
+  const { st, s, floor, pose } = af;
+  // soft contact shadow (shrinks when airborne)
+  const lift = -(pose.root?.pos?.[1] || 0);
+  const k = Math.max(0.4, 1 - lift / 260);
+  ctx.save();
+  ctx.globalAlpha = 0.22 * k;
+  ctx.fillStyle = '#000';
+  ctx.beginPath();
+  ctx.ellipse(st.x, floor + 4, 64 * s * k, 13 * s * k, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  drawRig(ctx, af.rig, af.char, pose, st.face, af.placement);
+}
+
+/** Screen effects (rain, fog, grades…) over the scene, in layer order. Seeded per scene + effect. */
+function drawEffects(ctx, scene, lt, frameOf) {
+  const list = effectsAt(scene, lt);
+  if (!list.length) return;
+  const sorted = list.map((e, i) => ({ e, i, fx: EFFECTS[e.id] })).filter((x) => x.fx).sort((a, b) => (a.fx.layer || 0) - (b.fx.layer || 0) || a.i - b.i);
+  for (const { e, fx } of sorted) {
+    let opts = { ...e.opts, amount: e.amount };
+    if (e.opts.follow) {
+      const af = frameOf(e.opts.follow, lt);
+      if (af) opts = { ...opts, x: (af.st.x / STAGE_W) * 100 };
+    }
+    ctx.save();
+    fx.draw(ctx, STAGE_W, STAGE_H, lt, opts, seedOf(scene.id + ':' + e.id));
+    ctx.restore();
+  }
+}
+function seedOf(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0) % 100003;
 }
 
 const FONT = '"Segoe UI", Inter, system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif';

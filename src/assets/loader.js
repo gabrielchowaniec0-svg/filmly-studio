@@ -9,11 +9,12 @@ async function getJSON(url) {
 
 export async function loadAssets(base = './') {
   const manifest = await getJSON(base + 'src/assets/manifest.json');
-  const assets = { rigs: {}, characters: {}, scenes: {}, voices: {}, manifest };
+  const assets = { rigs: {}, characters: {}, scenes: {}, voices: {}, props: {}, manifest };
   await Promise.all([
     ...manifest.rigs.map(async (p) => { const j = await getJSON(base + p); assets.rigs[j.id] = j; }),
     ...manifest.characters.map(async (p) => { const j = await getJSON(base + p); assets.characters[j.id] = j; }),
     ...manifest.scenes.map(async (p) => { const j = await getJSON(base + p); assets.scenes[j.id] = j; }),
+    ...(manifest.props || []).map(async (p) => { const j = await getJSON(base + p); assets.props[j.id] = j; }),
     (async () => {
       const v = await getJSON(base + manifest.voices);
       for (const voice of v.voices) assets.voices[voice.id] = voice;
@@ -24,5 +25,5 @@ export async function loadAssets(base = './') {
 
 /** Plain, structured-cloneable copy of the parts of the asset bundle the renderer needs (for workers). */
 export function renderAssets(assets) {
-  return { rigs: assets.rigs, characters: assets.characters, scenes: assets.scenes, voices: assets.voices };
+  return { rigs: assets.rigs, characters: assets.characters, scenes: assets.scenes, voices: assets.voices, props: assets.props || {} };
 }

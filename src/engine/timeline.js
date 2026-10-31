@@ -235,8 +235,9 @@ export function actorState(scene, name, lt) {
   let gaze = [0, 0];
   const towards = (other) => {
     const B = P.actors[other];
-    if (!B) return [0, 0];
-    const dx = posOf(B, lt).x - pos.x;
+    const bx = B ? posOf(B, lt).x : propState(scene, other, lt)?.x;
+    if (bx == null) return [0, 0];
+    const dx = bx - pos.x;
     return Math.abs(dx) < 4 ? [0, 0] : [Math.sign(dx) * fSign * 4.5, 0];
   };
   const tgt = look.target;
@@ -291,4 +292,100 @@ export function windowsAt(film, t) {
 
 export function frameCount(film) {
   return Math.max(1, Math.round(film.duration * film.meta.fps));
+}
+
+// ---- props & effects (scene.props / scene.propOrder and prop*/hold/drop/effect events) -------
+export const PROP_GRAB = 0.25; // seconds for a prop to glide into a hand
+export const PROP_FALL = 0.42; // seconds for a dropped prop to fall to the floor
+export const EFFECT_FADE = 0.5; // default effect fade in/out
+const propCache = new WeakMap();
+
+function propPosOf(A, t) {
+  let m = null;
+  for (const mv of A.moves) {
+    if (mv.t0 <= t) m = mv;
+    else break;
+  }
+  if (!m) return { ...A.init };
+  if (t >= m.t1) return { ...m.to };
+  const u = ease(m.ease || 'inout', (t - m.t0) / (m.t1 - m.t0));
+  return { x: lerp(m.from.x, m.to.x, u), y: lerp(m.from.y, m.to.y, u), up: lerp(m.from.up, m.to.up, u) };
+}
+
+export function prepareProps(scene) {
+  let P = propCache.get(scene);
+  if (P) return P;
+  P = { props: {}, effects: [] };
+  for (const [name, c] of Object.entries(scene.props || {})) {
+    P.props[name] = { name, init: { x: c.x, y: c.y || 0, up: c.up || 0 }, moves: [], vis: [{ t: -Infinity, v: !c.hidden }], attach: [{ t: -Infinity, actor: null, name }] };
+  }
+  const evs = (scene.events || []).map((e, i) => ({ e, i })).sort((a, b) => a.e.t - b.e.t || a.i - b.i);
+  for (const { e } of evs) {
+    if (e.type === 'effect') { P.effects.push(e); continue; }
+    const A = e.prop ? P.props[e.prop] : null;
+    if (!A) continue;
+    switch (e.type) {
+      case 'propmove': {
+        const from = propPosOf(A, e.t);
+        A.moves.push({ t0: e.t, t1: e.t + e.dur, from, to: { x: e.to.x ?? from.x, y: e.to.y ?? from.y, up: e.to.up ?? from.up }, ease: e.ease });
+        break;
+      }
+      case 'propvis': A.vis.push({ t: e.t, v: e.v }); break;
+      case 'hold': A.attach.push({ t: e.t, actor: e.actor, hand: e.hand, name: A.name }); A.vis.push({ t: e.t, v: true }); break;
+      case 'drop': {
+        A.attach.push({ t: e.t, actor: null, name: A.name });
+        const to = { x: e.to.x, y: e.to.y, up: 0 };
+        A.moves.push({ t0: e.t, t1: e.t, from: to, to });
+        break;
+      }
+      default: break;
+    }
+  }
+  propCache.set(scene, P);
+  return P;
+}
+
+/** State of a prop at local scene time lt: position (stage px x, depth y, lift up), visibility, attachment. */
+export function propState(scene, name, lt) {
+  const A = prepareProps(scene).props[name];
+  if (!A) return null;
+  let ai = 0;
+  for (let i = 0; i < A.attach.length; i++) if (A.attach[i].t <= lt) ai = i;
+  const pos = propPosOf(A, lt);
+  return { visible: lastAtOrBefore(A.vis, lt).v, x: pos.x, y: pos.y, up: pos.up || 0, attach: A.attach[ai], prevAttach: ai > 0 ? A.attach[ai - 1] : null };
+}
+
+/** Which props an actor has in each hand at lt: {F: propName|null, N: propName|null}. */
+export function heldBy(scene, actor, lt) {
+  const out = { F: null, N: null };
+  const P = prepareProps(scene);
+  for (const A of Object.values(P.props)) {
+    let at = null;
+    for (const a of A.attach) { if (a.t <= lt) at = a; else break; }
+    if (at && at.actor === actor) out[at.hand] = A.name;
+  }
+  return out;
+}
+
+/** Active effects at lt: [{id, amount (fade applied), opts, start}] in the order they were started. */
+export function effectsAt(scene, lt) {
+  const P = prepareProps(scene);
+  if (!P.effects.length) return [];
+  const st = new Map(); // id -> {target, from, t, fade, opts, start}
+  const level = (s, t) => (s.fade > 0 ? lerp(s.from, s.target, Math.min(1, (t - s.t) / s.fade)) : s.target);
+  for (const e of P.effects) {
+    if (e.t > lt) break;
+    const ids = e.id === '*' ? [...st.keys()] : [e.id];
+    for (const id of ids) {
+      const prev = st.get(id);
+      const from = prev ? level(prev, e.t) : 0;
+      st.set(id, { target: e.amount, from, t: e.t, fade: e.fade ?? EFFECT_FADE, opts: e.id === '*' && prev ? prev.opts : e.opts || {}, start: prev && from > 0 ? prev.start : e.t });
+    }
+  }
+  const out = [];
+  for (const [id, s] of st) {
+    const a = level(s, lt);
+    if (a > 0.001) out.push({ id, amount: a, opts: s.opts, start: s.start });
+  }
+  return out;
 }
