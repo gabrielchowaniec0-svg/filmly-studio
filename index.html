@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,75 +8,119 @@
   <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
-  <header class="top">
-    <div class="brand"><span class="logo">▶</span> Filmly <b>Studio</b></div>
-    <select id="filmSelect" title="Open a film from /films"></select>
-    <button id="btnNew">New</button>
-    <button id="btnOpen">Open .fly…</button>
-    <button id="btnSave">Save .fly</button>
-    <button id="btnCreator">🧑‍🎨 Characters</button>
-    <button id="btnLab">🎙 Voice Lab</button>
-    <span class="spacer"></span>
-    <button id="btnClaude" title="Copy the language guide, asset list and your script to paste into Claude">Copy context for Claude</button>
-    <input type="file" id="fileInput" accept=".fly,.txt" hidden>
-  </header>
-
-  <main class="layout">
-    <aside class="panel assets" id="assets">
-      <nav class="tabs" id="assetTabs"></nav>
-      <div class="assetList" id="assetList"></div>
-    </aside>
-
-    <section class="stage">
-      <div class="screen"><canvas id="preview" width="1280" height="720"></canvas><div class="overlay" id="overlay"></div></div>
-      <div class="transport">
-        <button id="btnPlay" class="primary">▶ Play</button>
-        <input type="range" id="scrub" min="0" max="1000" value="0">
-        <span id="timeLabel" class="mono">0:00.00 / 0:00.00</span>
+  <div class="app" id="app">
+    <header class="appbar">
+      <button class="brand" id="btnHome" title="Home: your films and templates">
+        <span class="logo"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg></span>
+        <span>Filmly <b>Studio</b></span>
+      </button>
+      <nav class="menubar" id="menubar" aria-label="Main menu">
+        <button class="mbtn" data-menu="file">File</button>
+        <button class="mbtn" data-menu="edit">Edit</button>
+        <button class="mbtn" data-menu="insert">Insert</button>
+        <button class="mbtn" data-menu="view">View</button>
+        <button class="mbtn" data-menu="help">Help</button>
+      </nav>
+      <div class="project">
+        <button id="projName" class="projName">Untitled</button>
+        <span id="saveState" class="saveState">Saved</span>
       </div>
-      <div class="voicebar"><button id="btnVoices" title="Generate (and cache) audio for every line that uses a TTS engine">🎙 Generate voices</button><span id="voiceStatus" class="small"></span></div>
-      <details class="export" open>
-        <summary>Export MP4</summary>
-        <div class="grid">
-          <label>Resolution
-            <select id="expRes">
-              <option value="1280">720p (1280×720)</option>
-              <option value="1920" selected>1080p (1920×1080)</option>
-              <option value="2560">1440p (2560×1440)</option>
-              <option value="3840">4K (3840×2160)</option>
-              <option value="7680">8K (7680×4320)</option>
-            </select>
-          </label>
-          <label>Frame rate
-            <select id="expFps">
-              <option value="0" selected>As written in film</option>
-              <option>24</option><option>30</option><option>60</option><option>120</option><option>240</option>
-            </select>
-          </label>
-          <label>Quality
-            <select id="expQuality"><option value="draft">Draft</option><option value="high" selected>High</option><option value="max">Maximum</option></select>
-          </label>
-          <label>Codec
-            <select id="expCodec"><option value="auto" selected>Auto</option><option value="avc">H.264</option><option value="hevc">HEVC (H.265)</option></select>
-          </label>
-          <label>Range
-            <select id="expRange"><option value="full" selected>Whole film</option><option value="5">First 5 seconds (test)</option></select>
-          </label>
-          <div class="go"><button id="btnExport" class="primary">Export MP4</button><button id="btnCancel" hidden>Cancel</button></div>
-        </div>
-        <div class="bar"><div id="expBar"></div></div>
-        <div id="expStatus" class="mono small"></div>
-      </details>
-    </section>
-
-    <section class="panel code">
-      <div class="editorWrap">
-        <div class="gutter mono" id="gutter"></div>
-        <textarea id="editor" class="mono" spellcheck="false" wrap="off"></textarea>
+      <span class="spacer"></span>
+      <div class="toolGroup">
+        <button id="btnCreator" class="tbtn" title="Character Creator: make your own character"></button>
+        <button id="btnLab" class="tbtn" title="Voice Lab: pick and test voices from 15 engines"></button>
+        <button id="btnClaude" class="tbtn" title="Copy the language guide, asset list and your script to paste into Claude"></button>
       </div>
-      <div class="problems" id="problems"></div>
-    </section>
-  </main>
+      <div class="toolGroup panels" id="panelToggles" aria-label="Show or hide panels"></div>
+      <button id="btnTheme" class="iconBtn ghost" title="Switch theme"></button>
+      <button id="btnOpenExport" class="primary exportBtn" title="Export MP4 (Ctrl+E)"></button>
+    </header>
+
+    <main class="workspace" id="workspace">
+      <aside class="panel library" id="pLibrary" aria-label="Library">
+        <div class="panelHead"><h3>Library</h3><span class="spacer"></span><button class="iconBtn ghost sm" data-collapse="library" title="Hide library"></button></div>
+        <div class="searchBox"><span class="sIcon"></span><input id="libSearch" type="search" placeholder="Search characters, scenes, moves…" autocomplete="off"></div>
+        <nav class="libTabs" id="libTabs" role="tablist"></nav>
+        <div class="libHint" id="libHint"></div>
+        <div class="libList" id="libList"></div>
+      </aside>
+      <div class="split v" data-split="library" title="Drag to resize"></div>
+
+      <section class="center">
+        <section class="stagePanel" id="pStage" aria-label="Stage">
+          <div class="stageWrap" id="stageWrap">
+            <div class="screen" id="screen">
+              <canvas id="preview" width="1280" height="720"></canvas>
+              <div class="overlay" id="overlay"></div>
+              <div class="dropHint" id="dropHint">Drop to add</div>
+            </div>
+          </div>
+          <input type="range" id="scrub" class="scrub" min="0" max="1000" value="0" aria-label="Playhead">
+          <div class="transport" id="transport">
+            <div class="tGroup">
+              <button class="iconBtn ghost" id="btnStart" title="Go to start (Home)"></button>
+              <button class="iconBtn ghost" id="btnPrev" title="Previous frame (←)"></button>
+              <button class="playBtn" id="btnPlay" title="Play / pause (Space)"></button>
+              <button class="iconBtn ghost" id="btnNext" title="Next frame (→)"></button>
+              <button class="iconBtn ghost toggle" id="btnLoop" title="Loop playback"></button>
+            </div>
+            <div class="timecode mono"><span id="timeLabel">0:00.00 / 0:00.00</span><small id="frameLabel">frame 0</small></div>
+            <span class="spacer"></span>
+            <div class="tGroup">
+              <label class="speed" title="Playback speed"><select id="speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label>
+              <button class="iconBtn ghost" id="btnFull" title="Fullscreen (F)"></button>
+            </div>
+          </div>
+        </section>
+        <div class="split h" data-split="timeline" title="Drag to resize"></div>
+        <section class="panel timeline" id="pTimeline" aria-label="Timeline">
+          <div class="panelHead">
+            <h3>Timeline</h3>
+            <span class="small dim" id="tlHint">Click to seek · double-click a block to open its line</span>
+            <span class="spacer"></span>
+            <button class="iconBtn ghost sm" id="tlZoomOut" title="Zoom out"></button>
+            <input type="range" id="tlZoom" min="10" max="400" value="60" aria-label="Timeline zoom">
+            <button class="iconBtn ghost sm" id="tlZoomIn" title="Zoom in"></button>
+            <button class="ghost sm" id="tlFit" title="Fit the whole film">Fit</button>
+            <button class="iconBtn ghost sm" data-collapse="timeline" title="Hide timeline"></button>
+          </div>
+          <div class="tlBody" id="tlBody">
+            <div class="tlLabels" id="tlLabels"></div>
+            <div class="tlScroll" id="tlScroll"><div class="tlContent" id="tlContent"></div></div>
+          </div>
+        </section>
+      </section>
+
+      <div class="split v" data-split="right" title="Drag to resize"></div>
+      <aside class="right" id="pRight">
+        <section class="panel inspector" id="pInspector" aria-label="Inspector">
+          <div class="panelHead"><h3>Inspector</h3><span class="spacer"></span><div id="insertMode"></div><button class="iconBtn ghost sm" data-collapse="inspector" title="Hide inspector"></button></div>
+          <div class="inspBody" id="inspBody"></div>
+        </section>
+        <div class="split h" data-split="inspector" title="Drag to resize"></div>
+        <section class="panel script" id="pScript" aria-label="Script">
+          <div class="panelHead">
+            <h3>Script</h3><span class="tag">.fly</span>
+            <span class="spacer"></span>
+            <button class="iconBtn ghost sm" id="btnUndo" title="Undo (Ctrl+Z)"></button>
+            <button class="iconBtn ghost sm" id="btnRedo" title="Redo (Ctrl+Shift+Z)"></button>
+            <button class="iconBtn ghost sm" data-collapse="script" title="Hide script"></button>
+          </div>
+          <div class="codeHost" id="codeHost"></div>
+          <div class="problems" id="problems" aria-live="polite"></div>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="statusbar">
+      <button class="stItem" id="stCompile" title="Compile status — click to jump to the first problem"></button>
+      <span class="stItem" id="stFilm"></span>
+      <span class="spacer"></span>
+      <button class="stItem voice" id="voiceStatus" title="Voices used by this film"></button>
+      <button class="stBtn" id="btnVoices" title="Generate (and cache) audio for every line that uses a TTS engine">Generate voices</button>
+    </footer>
+  </div>
+  <input type="file" id="fileInput" accept=".fly,.txt" hidden>
   <script type="module" src="src/main.js"></script>
 </body>
 </html>

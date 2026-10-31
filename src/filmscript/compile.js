@@ -187,14 +187,15 @@ export function compile(ast, assets, opts = {}) {
       }
       return (clip?.speed || 190) * legs * (ch.scale || 1) * (cast[name].scale || 1) * (1 + (y || 0) * 0.002);
     };
-    const push = (e, end) => { events.push(e); maxEnd = Math.max(maxEnd, end ?? e.t); };
+    let curLine = 0; // source line of the statement being compiled (events carry it so the editor can jump back)
+    const push = (e, end) => { if (e.line == null && curLine) e.line = curLine; events.push(e); maxEnd = Math.max(maxEnd, end ?? e.t); };
     const advance = (it, dur) => { if (!it.concurrent) now += dur; maxEnd = Math.max(maxEnd, now); };
 
     run(sc.body);
 
     function run(items) {
       for (const it of items) {
-        try { exec(it); } catch (e) {
+        try { curLine = it.line; exec(it); } catch (e) {
           if (e instanceof FSError) err(e.line || it.line, e.message, e.col); else throw e;
         }
       }
@@ -211,10 +212,10 @@ export function compile(ast, assets, opts = {}) {
           const x = (it.x / 100) * STAGE_W;
           const facing = it.props.facing || (it.x > 50 ? 'left' : 'right');
           if (facing !== 'left' && facing !== 'right') throw new FSError('facing must be left or right', it.line);
-          cast[it.name] = { char: it.char, x, y: it.y, facing, hidden: it.hidden, scale: it.props.scale };
+          cast[it.name] = { char: it.char, x, y: it.y, facing, hidden: it.hidden, scale: it.props.scale, line: it.line };
           castOrder.push(it.name);
           pos[it.name] = { x, y: it.y };
-          if (it.props.mood) events.push({ type: 'mood', t: 0, actor: it.name, mood: checkMood(it.props.mood, it.line) });
+          if (it.props.mood) events.push({ type: 'mood', t: 0, actor: it.name, mood: checkMood(it.props.mood, it.line), line: it.line });
           break;
         }
         case 'say': {
@@ -520,8 +521,8 @@ export function compile(ast, assets, opts = {}) {
 
     const duration = Math.max(0.5, Math.max(maxEnd, now) + (sc.props.tail ?? 0.5));
     return {
-      id: sc.id, bg: bgId, start: 0, duration, cast, castOrder, events, props: sceneProps, propOrder,
-      transitionIn: transition ? { type: transition.name, dur: transition.dur } : null,
+      id: sc.id, bg: bgId, start: 0, duration, cast, castOrder, events, props: sceneProps, propOrder, line: sc.line,
+      transitionIn: transition ? { type: transition.name, dur: transition.dur, line: transition.line } : null,
     };
   }
 
