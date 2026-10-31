@@ -4,7 +4,7 @@ import { loadAssetsFs } from './helpers.mjs';
 import { compileSource } from '../src/filmscript/index.js';
 import { parse } from '../src/filmscript/parse.js';
 import { actorState, windowsAt, captionsAt, cameraAt, frameCount } from '../src/engine/timeline.js';
-import { buildTalk, mouthAt, blipSchedule, estimateSpeechDuration } from '../src/engine/lipsync.js';
+import { buildTalk, mouthAt, estimateSpeechDuration } from '../src/engine/lipsync.js';
 import { sampleKeys } from '../src/engine/rig.js';
 
 const A = loadAssetsFs();
@@ -110,10 +110,10 @@ test('variables, mood props, voices', () => {
   const f = ok(H + `let who = bo
 scene s bg=studio {
   cast a: $who at 50
-  a: "x" mood=sad voice=blip_deep
+  a: "x" mood=sad voice=browser_deep
 }`);
   assert.equal(f.scenes[0].cast.a.char, 'bo');
-  assert.equal(f.scenes[0].events.find((e) => e.type === 'say').voice.id, 'blip_deep');
+  assert.equal(f.scenes[0].events.find((e) => e.type === 'say').voice.id, 'browser_deep');
   assert.equal(actorState(f.scenes[0], 'a', 0.1).face.brows, 'sad');
 });
 
@@ -155,14 +155,12 @@ test('frameCount uses fps', () => {
   assert.equal(frameCount(f), Math.round(f.duration * 30));
 });
 
-test('lipsync: deterministic, covers duration, blips match syllables', () => {
+test('lipsync: deterministic and covers the duration', () => {
   const talk = buildTalk('Hello, world! How are you?', 3);
   assert.equal(talk.segments.at(-1).t1.toFixed(6), '3.000000');
   assert.equal(mouthAt(talk, 3.5), null);
-  const blips = blipSchedule(talk, { pitch: 300, variation: 0.2 });
-  assert.ok(blips.length >= 6);
-  assert.ok(blips.every((b) => b.freq > 150 && b.freq < 700 && b.dur > 0));
-  assert.deepEqual(blipSchedule(buildTalk('Hello, world! How are you?', 3), { pitch: 300, variation: 0.2 }), blips);
+  assert.deepEqual(buildTalk('Hello, world! How are you?', 3), talk);
+  assert.ok(talk.segments.filter((x) => x.kind === 'syl').length >= 6);
   assert.ok(estimateSpeechDuration('one two three four five six') > estimateSpeechDuration('one two'));
 });
 
@@ -198,7 +196,7 @@ scene s bg=studio {
   assert.equal(says[0].env.rate, 100);
   assert.deepEqual([says[1].voice.engine, says[1].voice.voice], ['elevenlabs', '21m00Tcm4TlvDq8ikWAM']);
   assert.equal(says[2].voice.engine, 'kokoro');
-  assert.equal(says[3].voice.engine, 'blip');
+  assert.equal(says[3].voice.engine, 'webspeech');
   assert.equal(r.lines.length, 4);
   let e = bad(H + 'voice n = openai:onyx mood=sad\nscene s bg=studio {\n}');
   assert.match(e[0].message, /"mood" isn't an option for OpenAI/);

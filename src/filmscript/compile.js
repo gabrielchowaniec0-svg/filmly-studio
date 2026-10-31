@@ -3,7 +3,7 @@ import { FSError } from './parse.js';
 import { estimateSpeechDuration } from '../engine/lipsync.js';
 import { MOODS, STAGE_W } from '../engine/timeline.js';
 import { TRANSITIONS } from '../assets/transitions/index.js';
-import { PROVIDERS, parseVoiceSpec, needsAudio } from '../tts/catalog.js';
+import { PROVIDERS, parseVoiceSpec, needsAudio, DEFAULT_VOICE } from '../tts/catalog.js';
 
 function lev(a, b) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
@@ -193,7 +193,7 @@ export function compile(ast, assets, opts = {}) {
         case 'say': {
           const a = need(it.actor, it.line);
           const char = charOf(a.char);
-          const voice = resolveVoice(it.props.voice || char.voice || 'blip', it.line);
+          const voice = resolveVoice(it.props.voice || char.voice || DEFAULT_VOICE, it.line);
           uses.voices.add(voice.id || `${voice.engine}:${voice.voice}`);
           const audio = it.props.audio;
           if (audio) uses.audio.add(audio);

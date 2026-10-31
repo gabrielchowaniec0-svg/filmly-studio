@@ -12,7 +12,7 @@ Everything is vector + HTML, so output is resolution independent and exports str
    identically in preview and export, at any resolution or fps.
 3. **No bundler, no runtime dependencies.** Plain ES modules served statically (Netlify, any host).
    The MP4 muxer is our own (`src/export/mp4mux.js`).
-4. **Honest audio.** Voices declare whether they are exportable (`blip`, `file`, `elevenlabs`) or
+4. **Honest audio.** Voices declare whether they are exportable (`kokoro`, `file`, cloud engines) or
    preview-only (`webspeech`). Export only mixes what can actually be captured.
 
 ## Layout
@@ -22,7 +22,7 @@ Everything is vector + HTML, so output is resolution independent and exports str
 | `src/assets/rigs/` | Skeleton + parts + clips (animations). `humanoid.json` is the first rig. |
 | `src/assets/characters/` | Variants of a rig: palette + slot options (hair, outfit, accessory). |
 | `src/assets/scenes/` | Backgrounds / scene types (floor line, layered vector props). |
-| `src/assets/voices/` | Voice presets (blip, ElevenLabs, WebSpeech, recorded file). |
+| `src/assets/voices/` | Voice presets (browser voices by default, Kokoro, cloud engines). |
 | `src/assets/transitions/` | Transition functions (fade, wipe, iris, push, dip...). |
 | `src/engine/` | paint, rig/FK, timeline evaluation, lip-sync, renderer, audio mixer. |
 | `src/filmscript/` | Parser + compiler: `.fly` text -> film JSON. |

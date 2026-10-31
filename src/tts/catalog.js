@@ -10,17 +10,6 @@
 const KEY = (label = 'API key', placeholder = '') => ({ key: 'apiKey', label, secret: true, placeholder });
 
 export const PROVIDERS = {
-  blip: {
-    label: 'Blip synth (built-in)', kind: 'synth', exportable: true, free: true,
-    blurb: 'Cartoon "animal crossing" style babble generated on your device. Always works, always exports.',
-    fields: [],
-    params: [
-      { key: 'pitch', label: 'Pitch (Hz)', default: 260 },
-      { key: 'wave', label: 'Wave', default: 'triangle', options: ['sine', 'triangle', 'square', 'sawtooth'] },
-      { key: 'variation', label: 'Variation', default: 0.2 },
-    ],
-    voices: [{ id: 'default', name: 'Default' }],
-  },
   kokoro: {
     label: 'Kokoro (free, runs in your browser)', kind: 'local', exportable: true, free: true,
     blurb: 'Open-weight 82M model running fully in the browser via WebAssembly. No key; first use downloads ~90 MB once.',
@@ -34,11 +23,16 @@ export const PROVIDERS = {
     })),
   },
   webspeech: {
-    label: 'Browser voices (preview only)', kind: 'browser', exportable: false, free: true,
-    blurb: "Your OS/browser's built-in voices. Great for drafting; browsers don't let pages record them, so exports are silent for these lines.",
+    label: 'Browser voices (default)', kind: 'browser', exportable: false, free: true,
+    blurb: "Your computer's built-in voices — free, instant, no setup. They play in the preview; browsers don't let pages record them, so MP4 exports are silent for these lines (switch to Kokoro or a cloud voice before exporting with sound).",
     fields: [],
-    params: [{ key: 'rate', label: 'Rate', default: 1 }, { key: 'pitch', label: 'Pitch', default: 1 }, { key: 'lang', label: 'Language', default: 'en-US' }],
-    voices: [{ id: 'default', name: 'System default' }],
+    params: [
+      { key: 'gender', label: 'Prefer', default: 'any', options: ['any', 'female', 'male'] },
+      { key: 'lang', label: 'Language', default: 'en-US' },
+      { key: 'rate', label: 'Rate', default: 1 },
+      { key: 'pitch', label: 'Pitch', default: 1 },
+    ],
+    voices: [{ id: 'auto', name: 'Automatic (best match for language + gender)' }],
     listVoices: true,
   },
   openai: {
@@ -163,4 +157,5 @@ export function lineKey(voice, text) {
 }
 
 /** Does this voice need generated audio (as opposed to synth/browser)? */
-export const needsAudio = (voice) => !!voice && PROVIDERS[voice.engine] && !['blip', 'webspeech'].includes(voice.engine);
+export const needsAudio = (voice) => !!voice && !!PROVIDERS[voice.engine] && voice.engine !== 'webspeech';
+export const DEFAULT_VOICE = 'browser_auto';

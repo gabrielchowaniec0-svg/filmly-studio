@@ -58,9 +58,8 @@ Write `provider:voice` anywhere a voice is expected, or define a named voice wit
 
 | provider | example | notes |
 |---|---|---|
-| `blip` | `voice=blip_deep` (presets) | built-in synth, offline, always exports |
 | `kokoro` | `kokoro:af_heart`, `kokoro:bm_george` | free, runs in the browser, ~90 MB model downloaded once |
-| `webspeech` | `webspeech:default` | your OS voices — **preview only**, silent in exports |
+| `webspeech` | `voice=browser_bright` (presets) or `webspeech:auto` + `gender=female` `lang=en-GB` `pitch` `rate` | **default**. Your computer's voices, free — preview only, silent in MP4 exports |
 | `openai` | `openai:coral` + `style="whisper"` `model=tts-1-hd` `speed=1.1` | |
 | `elevenlabs` | `elevenlabs:21m00Tcm4TlvDq8ikWAM` + `model=eleven_v3` `stability=0.4` | "Load my voices" lists your library |
 | `google` | `google:en-US-Neural2-F` + `speed` `pitch` | Cloud TTS API key |

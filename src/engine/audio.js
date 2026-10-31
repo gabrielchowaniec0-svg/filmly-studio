@@ -1,5 +1,4 @@
 // Offline audio mix for preview and export. Main thread only (OfflineAudioContext is not in workers).
-import { buildTalk, blipSchedule } from './lipsync.js';
 
 const SR = 48000;
 
@@ -54,16 +53,13 @@ export async function mixAudio(film, assets, opts = {}) {
   for (const cue of cues) {
     try {
       if (cue.kind === 'say') {
-        const voice = typeof cue.voice === 'object' ? cue.voice : assets.voices[cue.voice] || { engine: 'blip' };
+        const voice = typeof cue.voice === 'object' ? cue.voice : assets.voices[cue.voice] || { engine: 'webspeech' };
         if (cue.audio) {
           const buf = await decode(cue.audio, () => load(cue.audio));
           playBuffer(ctx, master, buf, cue.t, 1);
           any = true;
-        } else if (voice.engine === 'blip') {
-          scheduleBlips(ctx, master, voice, cue);
-          any = true;
         } else if (voice.engine === 'webspeech') {
-          warnOnce(`"${voice.name || voice.id || 'Browser voice'}" uses browser speech, which can't be recorded into a video. Pick a blip, Kokoro or cloud voice for export.`);
+          warnOnce('Lines using browser voices are silent in the MP4 (browsers don\'t allow recording them). For sound, switch those voices to Kokoro (free) or a cloud voice in Voice Lab.');
         } else {
           const bytes = opts.tts ? await opts.tts(voice, cue.text) : null;
           if (bytes) {
@@ -99,23 +95,4 @@ function playBuffer(ctx, dest, buf, t, vol = 1, loop = false, fade = 0) {
   src.connect(g).connect(dest);
   src.start(t);
   return src;
-}
-
-export function scheduleBlips(ctx, dest, voice, cue) {
-  const talk = buildTalk(cue.text, cue.dur);
-  const blips = blipSchedule(talk, voice);
-  for (const b of blips) {
-    const t = cue.t + b.t;
-    const osc = ctx.createOscillator();
-    osc.type = voice.wave || 'triangle';
-    osc.frequency.setValueAtTime(b.freq, t);
-    osc.frequency.linearRampToValueAtTime(b.freq * 0.96, t + b.dur);
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(0.2, t + 0.012);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(0.03, b.dur));
-    osc.connect(g).connect(dest);
-    osc.start(t);
-    osc.stop(t + Math.max(0.04, b.dur) + 0.02);
-  }
 }

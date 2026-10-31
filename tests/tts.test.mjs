@@ -125,16 +125,17 @@ test('catalog helpers', () => {
   assert.deepEqual(parseVoiceSpec('openai:coral'), { engine: 'openai', voice: 'coral' });
   assert.equal(parseVoiceSpec('nope:x'), null);
   assert.equal(parseVoiceSpec('kokoro').voice, 'af_heart');
+  assert.equal(parseVoiceSpec('webspeech').voice, 'auto');
   assert.notEqual(lineKey({ engine: 'openai', voice: 'coral' }, 'a'), lineKey({ engine: 'openai', voice: 'coral', style: 'sad' }, 'a'));
   assert.equal(lineKey({ engine: 'openai', voice: 'coral', id: 'x', name: 'y' }, 'a'), lineKey({ engine: 'openai', voice: 'coral' }, 'a'));
-  assert.equal(needsAudio({ engine: 'blip' }), false);
   assert.equal(needsAudio({ engine: 'webspeech' }), false);
   assert.equal(needsAudio({ engine: 'kokoro' }), true);
   for (const [id, p] of Object.entries(PROVIDERS)) {
     assert.ok(p.label && p.blurb && Array.isArray(p.fields) && Array.isArray(p.params) && Array.isArray(p.voices), id);
     assert.equal(typeof p.exportable, 'boolean', id);
   }
-  assert.ok(Object.keys(PROVIDERS).length >= 15);
+  assert.ok(Object.keys(PROVIDERS).length >= 14);
+  assert.equal(PROVIDERS.blip, undefined);
 });
 
 test('pcm16ToWav header', () => {

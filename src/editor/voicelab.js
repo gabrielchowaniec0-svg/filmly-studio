@@ -2,7 +2,6 @@
 import { PROVIDERS, PROVIDER_IDS } from '../tts/catalog.js';
 import { loadSettings, saveSettings, providerConfig, isConfigured, synthesize, listVoices, browserVoices, speakBrowser, stopBrowserSpeech, clearCache } from '../tts/index.js';
 import { buildTalk } from '../engine/lipsync.js';
-import { scheduleBlips } from '../engine/audio.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 let audioCtx = null;
@@ -19,16 +18,6 @@ async function playBytes(bytes) {
   src.start();
   current = src;
   return buf.duration;
-}
-async function playBlip(voice, text) {
-  audioCtx = audioCtx || new AudioContext();
-  await audioCtx.resume();
-  stopAll();
-  const dur = Math.max(0.8, text.split(/\s+/).length * 0.32);
-  const g = audioCtx.createGain();
-  g.connect(audioCtx.destination);
-  scheduleBlips(audioCtx, g, voice, { t: audioCtx.currentTime + 0.05, text, dur });
-  current = { stop: () => g.disconnect() };
 }
 function stopAll() {
   try { current && current.stop(); } catch { /* already stopped */ }
@@ -49,7 +38,7 @@ export function openVoiceLab(host) {
   }
   const settings = loadSettings();
   const state = { engine: state0(), voices: {}, sample: 'Hi! I just got here. Did I miss anything exciting?' };
-  function state0() { return PROVIDER_IDS.find((id) => id !== 'blip' && isConfigured(id, settings)) || 'kokoro'; }
+  function state0() { return PROVIDER_IDS.find((id) => PROVIDERS[id].kind === 'cloud' && isConfigured(id, settings)) || 'webspeech'; }
 
   const render = () => {
     const meta = PROVIDERS[state.engine];
@@ -128,8 +117,7 @@ export function openVoiceLab(host) {
       const text = state.sample;
       setStatus('Generating…');
       try {
-        if (v.engine === 'blip') { await playBlip({ ...v, pitch: +v.pitch || 260 }, text); setStatus('Playing blip voice.'); }
-        else if (v.engine === 'webspeech') { speakBrowser(text, v); setStatus('Speaking with your browser (preview only — not included in MP4 exports).'); }
+        if (v.engine === 'webspeech') { speakBrowser(text, v); setStatus('Speaking with your browser (preview only — not included in MP4 exports).'); }
         else {
           const t0 = performance.now();
           const bytes = await synthesize(v, text, { settings, onProgress: (p) => setStatus(`Downloading model… ${Math.round(p.progress || 0)}% (${p.file || ''})`) });

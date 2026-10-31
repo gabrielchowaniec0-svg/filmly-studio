@@ -1,11 +1,10 @@
-// Text -> timed mouth shapes (visemes). One schedule drives the mouth AND the blip voice, so they
-// never drift. When real speech audio is available, its loudness envelope gates the mouth too.
+// Text -> timed mouth shapes (visemes). When real speech audio is available, its loudness envelope
+// gates the mouth too, so lips stop when the voice pauses.
 //
 // Visemes match the rig's mouth slot: rest, mbp, fv, ee, ah, oh, oo, half.
 
 const VOWEL_VISEME = { a: 'ah', e: 'ee', i: 'ee', y: 'ee', o: 'oh', u: 'oo' };
 const DIGRAPH_VISEME = { ou: 'oh', ow: 'oh', oo: 'oo', ea: 'ee', ee: 'ee', ai: 'ah', ay: 'ee', oa: 'oh', au: 'ah', ie: 'ee' };
-const VOWEL_PITCH = { ah: 1.0, ee: 1.18, oh: 0.9, oo: 0.82 };
 
 function hash(str, seed = 0) {
   let h = 2166136261 ^ seed;
@@ -108,23 +107,4 @@ export function mouthAt(talk, t) {
     if (vis === 'rest') return 'half';
   }
   return vis;
-}
-
-/** Blip events for the audio synth: [{t, dur, freq}] relative to line start. */
-export function blipSchedule(talk, voice) {
-  const base = voice.pitch ?? 260;
-  const variation = voice.variation ?? 0.2;
-  const out = [];
-  const segs = talk.segments;
-  for (let i = 0; i < segs.length; i++) {
-    const s = segs[i];
-    if (s.kind !== 'syl') continue;
-    const vp = VOWEL_PITCH[s.vis] || 1;
-    const jitter = 1 + (s.seed - 0.5) * 2 * variation;
-    let freq = base * vp * jitter;
-    const next = segs.slice(i + 1).find((x) => x.kind === 'pause' && x.end);
-    if (next && next.question && segs.length - i < 8) freq *= 1.18;
-    out.push({ t: s.t0, dur: (s.t1 - s.t0) * 0.88, freq });
-  }
-  return out;
 }

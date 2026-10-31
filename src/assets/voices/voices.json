@@ -1,27 +1,196 @@
 {
-  "note": "Voice presets usable as voice=<id>. Any provider voice also works inline as provider:voice (e.g. voice=openai:coral). Blip voices are synthesized and always export; other engines are generated once (Voice Lab) and cached in your browser.",
+  "note": "Voice presets usable as voice=<id>. Browser voices are the default (free, preview only). Any provider voice also works inline as provider:voice (e.g. voice=kokoro:af_heart, voice=openai:coral). Non-browser engines are generated once (Voice Lab) and cached in your browser, and they export to MP4.",
   "voices": [
-    { "id": "blip_bright", "name": "Bright blips", "engine": "blip", "pitch": 330, "wave": "triangle", "variation": 0.22 },
-    { "id": "blip_mellow", "name": "Mellow blips", "engine": "blip", "pitch": 190, "wave": "square", "variation": 0.18 },
-    { "id": "blip_squeak", "name": "Squeaky blips", "engine": "blip", "pitch": 470, "wave": "sine", "variation": 0.28 },
-    { "id": "blip_deep", "name": "Deep blips", "engine": "blip", "pitch": 120, "wave": "sawtooth", "variation": 0.12 },
-    { "id": "blip_warm", "name": "Warm blips", "engine": "blip", "pitch": 280, "wave": "sine", "variation": 0.16 },
-    { "id": "blip_buzzy", "name": "Buzzy blips", "engine": "blip", "pitch": 230, "wave": "sawtooth", "variation": 0.24 },
-    { "id": "narrator_browser", "name": "Narrator (browser, preview only)", "engine": "webspeech", "voice": "default", "rate": 1 },
-    { "id": "kokoro_heart", "name": "Kokoro · Heart (free, in-browser)", "engine": "kokoro", "voice": "af_heart" },
-    { "id": "kokoro_michael", "name": "Kokoro · Michael (free, in-browser)", "engine": "kokoro", "voice": "am_michael" },
-    { "id": "kokoro_emma", "name": "Kokoro · Emma (free, in-browser)", "engine": "kokoro", "voice": "bf_emma" },
-    { "id": "kokoro_george", "name": "Kokoro · George (free, in-browser)", "engine": "kokoro", "voice": "bm_george" },
-    { "id": "openai_coral", "name": "OpenAI · Coral", "engine": "openai", "voice": "coral" },
-    { "id": "openai_onyx", "name": "OpenAI · Onyx (narrator)", "engine": "openai", "voice": "onyx", "style": "Warm, unhurried storyteller." },
-    { "id": "eleven_rachel", "name": "ElevenLabs · Rachel", "engine": "elevenlabs", "voice": "21m00Tcm4TlvDq8ikWAM" },
-    { "id": "eleven_adam", "name": "ElevenLabs · Adam", "engine": "elevenlabs", "voice": "pNInz6obpgDQGcFmaJgB" },
-    { "id": "gemini_kore", "name": "Gemini · Kore", "engine": "gemini", "voice": "Kore" },
-    { "id": "gemini_puck", "name": "Gemini · Puck", "engine": "gemini", "voice": "Puck" },
-    { "id": "azure_andrew", "name": "Azure · Andrew", "engine": "azure", "voice": "en-US-AndrewNeural" },
-    { "id": "azure_jenny_cheerful", "name": "Azure · Jenny (cheerful)", "engine": "azure", "voice": "en-US-JennyNeural", "style": "cheerful" },
-    { "id": "google_neural_f", "name": "Google · Neural2-F", "engine": "google", "voice": "en-US-Neural2-F" },
-    { "id": "polly_joanna", "name": "Amazon Polly · Joanna", "engine": "polly", "voice": "Joanna" },
-    { "id": "deepgram_thalia", "name": "Deepgram · Thalia", "engine": "deepgram", "voice": "aura-2-thalia-en" }
+    {
+      "id": "browser_auto",
+      "name": "Browser \u00b7 automatic",
+      "engine": "webspeech",
+      "voice": "auto"
+    },
+    {
+      "id": "browser_female",
+      "name": "Browser \u00b7 female",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "female"
+    },
+    {
+      "id": "browser_male",
+      "name": "Browser \u00b7 male",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "male"
+    },
+    {
+      "id": "browser_bright",
+      "name": "Browser \u00b7 bright (female)",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "female",
+      "pitch": 1.2,
+      "rate": 1.05
+    },
+    {
+      "id": "browser_warm",
+      "name": "Browser \u00b7 warm (female)",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "female",
+      "pitch": 1.0,
+      "rate": 0.97
+    },
+    {
+      "id": "browser_teen",
+      "name": "Browser \u00b7 teen (male)",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "male",
+      "pitch": 1.15,
+      "rate": 1.06
+    },
+    {
+      "id": "browser_deep",
+      "name": "Browser \u00b7 deep (male)",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "male",
+      "pitch": 0.8,
+      "rate": 0.94
+    },
+    {
+      "id": "browser_kid",
+      "name": "Browser \u00b7 kid",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "female",
+      "pitch": 1.55,
+      "rate": 1.1
+    },
+    {
+      "id": "browser_elder_m",
+      "name": "Browser \u00b7 older man",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "male",
+      "pitch": 0.85,
+      "rate": 0.86
+    },
+    {
+      "id": "browser_elder_f",
+      "name": "Browser \u00b7 older woman",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "female",
+      "pitch": 0.92,
+      "rate": 0.88
+    },
+    {
+      "id": "browser_uk_f",
+      "name": "Browser \u00b7 British (female)",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "female",
+      "lang": "en-GB"
+    },
+    {
+      "id": "browser_uk_m",
+      "name": "Browser \u00b7 British (male)",
+      "engine": "webspeech",
+      "voice": "auto",
+      "gender": "male",
+      "lang": "en-GB"
+    },
+    {
+      "id": "kokoro_heart",
+      "name": "Kokoro \u00b7 Heart (free, in-browser)",
+      "engine": "kokoro",
+      "voice": "af_heart"
+    },
+    {
+      "id": "kokoro_michael",
+      "name": "Kokoro \u00b7 Michael (free, in-browser)",
+      "engine": "kokoro",
+      "voice": "am_michael"
+    },
+    {
+      "id": "kokoro_emma",
+      "name": "Kokoro \u00b7 Emma (free, in-browser)",
+      "engine": "kokoro",
+      "voice": "bf_emma"
+    },
+    {
+      "id": "kokoro_george",
+      "name": "Kokoro \u00b7 George (free, in-browser)",
+      "engine": "kokoro",
+      "voice": "bm_george"
+    },
+    {
+      "id": "openai_coral",
+      "name": "OpenAI \u00b7 Coral",
+      "engine": "openai",
+      "voice": "coral"
+    },
+    {
+      "id": "openai_onyx",
+      "name": "OpenAI \u00b7 Onyx (narrator)",
+      "engine": "openai",
+      "voice": "onyx",
+      "style": "Warm, unhurried storyteller."
+    },
+    {
+      "id": "eleven_rachel",
+      "name": "ElevenLabs \u00b7 Rachel",
+      "engine": "elevenlabs",
+      "voice": "21m00Tcm4TlvDq8ikWAM"
+    },
+    {
+      "id": "eleven_adam",
+      "name": "ElevenLabs \u00b7 Adam",
+      "engine": "elevenlabs",
+      "voice": "pNInz6obpgDQGcFmaJgB"
+    },
+    {
+      "id": "gemini_kore",
+      "name": "Gemini \u00b7 Kore",
+      "engine": "gemini",
+      "voice": "Kore"
+    },
+    {
+      "id": "gemini_puck",
+      "name": "Gemini \u00b7 Puck",
+      "engine": "gemini",
+      "voice": "Puck"
+    },
+    {
+      "id": "azure_andrew",
+      "name": "Azure \u00b7 Andrew",
+      "engine": "azure",
+      "voice": "en-US-AndrewNeural"
+    },
+    {
+      "id": "azure_jenny_cheerful",
+      "name": "Azure \u00b7 Jenny (cheerful)",
+      "engine": "azure",
+      "voice": "en-US-JennyNeural",
+      "style": "cheerful"
+    },
+    {
+      "id": "google_neural_f",
+      "name": "Google \u00b7 Neural2-F",
+      "engine": "google",
+      "voice": "en-US-Neural2-F"
+    },
+    {
+      "id": "polly_joanna",
+      "name": "Amazon Polly \u00b7 Joanna",
+      "engine": "polly",
+      "voice": "Joanna"
+    },
+    {
+      "id": "deepgram_thalia",
+      "name": "Deepgram \u00b7 Thalia",
+      "engine": "deepgram",
+      "voice": "aura-2-thalia-en"
+    }
   ]
 }

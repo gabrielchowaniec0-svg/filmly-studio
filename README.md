@@ -22,7 +22,7 @@ node --test tests/*.test.mjs          # language, engine, asset and MP4 muxer te
 | Characters | 12 people (mira, bo, juno, otto, priya, marcus, kai, nora, leo, grace, dex, sam) + a Character Creator for variants |
 | Animation | cross-faded walk/run/idle, gestures with holds, natural blinks, listeners watch the speaker, squash turns, viseme lip-sync driven by real audio |
 | Backgrounds | studio, living_room, street_day, night_forest |
-| Voices | 15 engines: blip synth, Kokoro (free, in-browser), browser voices, OpenAI, ElevenLabs, Google Cloud, Gemini, Azure, Amazon Polly, Deepgram, Cartesia, Hume, Fish Audio, LMNT, any OpenAI-compatible server |
+| Voices | 14 engines: browser voices (default, preview only), Kokoro (free, in-browser, exports), OpenAI, ElevenLabs, Google Cloud, Gemini, Azure, Amazon Polly, Deepgram, Cartesia, Hume, Fish Audio, LMNT, any OpenAI-compatible server |
 | Transitions | cut, fade, dip, wipes, pushes, iris, zoom, blinds |
 | Export | WebCodecs → own MP4 muxer (H.264 / HEVC, AAC / Opus), runs in a Web Worker |
 

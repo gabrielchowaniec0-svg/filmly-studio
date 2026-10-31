@@ -1,9 +1,9 @@
 # Hello, Filmly — a short demo of most FilmScript features.
-# Voices: these use the built-in blip synth so the film exports with sound out of the box.
-# Try swapping in real TTS: open Voice Lab, or change a line to  voice=kokoro:af_heart  (free, in-browser).
+# Voices: everyone uses your browser's built-in voices (free, preview only).
+# For sound in the exported MP4, open Voice Lab or change a voice to e.g.  voice=kokoro:af_heart  (free, in-browser).
 film "Hello, Filmly" 1920x1080 @30
 fade in 0.8s
-voice host = blip_bright
+voice host = browser_bright
 character rosa from priya hair=curly top=suit color.top=#2d6a8a color.top2=#f2b134 build=regular
 
 scene living bg=living_room {

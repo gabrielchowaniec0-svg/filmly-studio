@@ -155,19 +155,42 @@ export async function listVoices(engine, settings = loadSettings()) {
   return listVoicesHttp(engine, providerConfig(engine, settings), { proxy: !!settings.proxy?.[engine] });
 }
 
-// ---- browser speech (preview only) ---------------------------------------------------------------
+// ---- browser speech (default; preview only) --------------------------------------------------
+// Voice names differ per OS/browser, so "auto" picks the best match for language + gender.
+const FEMALE = /(female|woman|samantha|victoria|karen|moira|tessa|fiona|veena|zira|aria|jenny|emma|ava|allison|susan|serena|kate|libby|sonia|natasha|hazel|catherine|nicky|joanna|salli|kimberly|ivy|amy|olivia|google uk english female|google us english)/i;
+const MALE = /(male|\bman\b|daniel|alex|fred|david|mark|guy|ryan|george|james|arthur|oliver|thomas|aaron|rishi|tom|matthew|brian|joey|justin|davis|andrew|christopher|eric|roger|steffan|google uk english male)/i;
 export function browserVoices() {
   if (typeof speechSynthesis === 'undefined') return [];
-  return speechSynthesis.getVoices().map((v) => ({ id: v.name, name: v.name, info: `${v.lang}${v.localService ? ' · local' : ''}` }));
+  return [{ id: 'auto', name: 'Automatic (best match)', info: '' }].concat(speechSynthesis.getVoices().map((v) => ({ id: v.name, name: v.name, info: `${v.lang}${v.localService ? ' · local' : ' · online'}` })));
+}
+export function pickBrowserVoice(voice, all = typeof speechSynthesis !== 'undefined' ? speechSynthesis.getVoices() : []) {
+  if (!all.length) return null;
+  if (voice.voice && voice.voice !== 'auto' && voice.voice !== 'default') {
+    const exact = all.find((v) => v.name === voice.voice);
+    if (exact) return exact;
+  }
+  const lang = (voice.lang || 'en-US').toLowerCase();
+  const g = voice.gender || 'any';
+  const score = (v) => {
+    const vl = v.lang.toLowerCase().replace('_', '-');
+    let s = vl === lang ? 40 : vl.slice(0, 2) === lang.slice(0, 2) ? 20 : 0;
+    const isF = FEMALE.test(v.name) && !/\bmale\b/i.test(v.name.replace(/female/i, '')), isM = MALE.test(v.name) && !/female/i.test(v.name);
+    if (g === 'female') s += isF ? 25 : isM ? -25 : 0;
+    if (g === 'male') s += isM ? 25 : isF ? -25 : 0;
+    if (/natural|neural|enhanced|premium|google/i.test(v.name)) s += 6;
+    if (v.default) s += 2;
+    return s;
+  };
+  return [...all].sort((a, b) => score(b) - score(a))[0];
 }
 export function speakBrowser(text, voice) {
   if (typeof speechSynthesis === 'undefined') return;
   const u = new SpeechSynthesisUtterance(text);
-  const match = speechSynthesis.getVoices().find((v) => v.name === voice.voice);
+  const match = pickBrowserVoice(voice);
   if (match) u.voice = match;
   u.rate = +voice.rate || 1;
   u.pitch = +voice.pitch || 1;
-  u.lang = voice.lang || match?.lang || 'en-US';
+  u.lang = match?.lang || voice.lang || 'en-US';
   speechSynthesis.speak(u);
 }
 export function stopBrowserSpeech() { if (typeof speechSynthesis !== 'undefined') speechSynthesis.cancel(); }
