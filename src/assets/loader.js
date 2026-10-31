@@ -9,7 +9,7 @@ async function getJSON(url) {
 
 export async function loadAssets(base = './') {
   const manifest = await getJSON(base + 'src/assets/manifest.json');
-  const assets = { rigs: {}, characters: {}, scenes: {}, voices: {}, manifest };
+  const assets = { rigs: {}, characters: {}, scenes: {}, voices: {}, sounds: {}, manifest };
   await Promise.all([
     ...manifest.rigs.map(async (p) => { const j = await getJSON(base + p); assets.rigs[j.id] = j; }),
     ...manifest.characters.map(async (p) => { const j = await getJSON(base + p); assets.characters[j.id] = j; }),
@@ -18,11 +18,23 @@ export async function loadAssets(base = './') {
       const v = await getJSON(base + manifest.voices);
       for (const voice of v.voices) assets.voices[voice.id] = voice;
     })(),
+    // built-in sound library (sfx / music / ambience); optional so a missing file never blocks the editor
+    (async () => {
+      if (!manifest.sounds) return;
+      try { assets.sounds = soundsById(await getJSON(base + manifest.sounds)); } catch (e) { console.warn('Sound library unavailable:', e.message); }
+    })(),
   ]);
   return assets;
 }
 
+/** sounds.json ({sounds:[...]}) -> {id: {id, name, kind, file, duration, loop, tags}} */
+export function soundsById(json) {
+  const out = {};
+  for (const s of (json && json.sounds) || []) out[s.id] = s;
+  return out;
+}
+
 /** Plain, structured-cloneable copy of the parts of the asset bundle the renderer needs (for workers). */
 export function renderAssets(assets) {
-  return { rigs: assets.rigs, characters: assets.characters, scenes: assets.scenes, voices: assets.voices };
+  return { rigs: assets.rigs, characters: assets.characters, scenes: assets.scenes, voices: assets.voices, sounds: assets.sounds || {} };
 }

@@ -317,13 +317,7 @@ function parseStatement(T, ctx) {
       T.end();
       return node;
     }
-    case 'music': case 'sfx': {
-      T.next();
-      const src = T.string('a "path/to/audio.mp3" string');
-      const props = T.props();
-      T.end();
-      return { kind: kw, src, props };
-    }
+    case 'music': case 'sfx': case 'ambience': return parseSound(T, kw);
     case 'transition': {
       T.next();
       const name = T.expectId('a transition name (e.g. fade, wipe_left)');
@@ -342,6 +336,28 @@ function parseStatement(T, ctx) {
     default:
       return parseActorStatement(T, T.next());
   }
+}
+
+// Sound statements (see docs/FILMSCRIPT.md "Sound library"):
+//   sfx door_knock vol=0.8 | sfx "audio/x.wav"
+//   music spooky_mystery vol=0.4 fade=1s | music stop fade=2s | music off
+//   ambience rain vol=0.5 | ambience rain off | ambience off
+// -> { kind, sound: libraryId | null, src: quotedPath | null, stop: bool, props }
+function parseSound(T, kw) {
+  T.next();
+  const what = { music: 'a music id (e.g. happy_day) or "path/to/audio.mp3"', sfx: 'a sound id (e.g. door_knock) or "path/to/audio.wav"', ambience: 'an ambience id (e.g. rain) or "path/to/audio.mp3"' }[kw];
+  const tok = T.resolve(T.next());
+  if (!tok || (tok.t !== 'id' && tok.t !== 'str')) throw T.err(`Expected ${what}`, tok);
+  const node = { kind: kw, sound: null, src: null, stop: false, props: {} };
+  const isStop = tok.t === 'id' && (tok.v === 'stop' || tok.v === 'off');
+  if (isStop && kw === 'sfx') throw T.err('Sound effects play once and stop by themselves; "sfx stop" isn\'t needed', tok);
+  if (isStop) node.stop = true; // music stop / ambience off (all ambience)
+  else if (tok.t === 'str') node.src = tok.v;
+  else node.sound = tok.v;
+  if (!node.stop && kw === 'ambience' && (T.isId('off') || T.isId('stop'))) { T.next(); node.stop = true; }
+  node.props = T.props();
+  T.end();
+  return node;
 }
 
 /** Parse FilmScript source. Returns { ast, errors } where ast = {film, items[]} */

@@ -23,6 +23,7 @@
     "src/assets/scenes/studio.json"
   ],
   "voices": "src/assets/voices/voices.json",
+  "sounds": "src/assets/sounds/sounds.json",
   "films": [
     "films/hello-filmly.fly"
   ]
