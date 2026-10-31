@@ -1,9 +1,31 @@
 {
   "id": "juno",
   "name": "Juno",
+  "about": "Energetic kid, always asking questions.",
   "rig": "humanoid",
-  "scale": 0.88,
-  "options": { "hair": "bun", "outfit": "tee", "accessory": "hat" },
-  "palette": { "skin": "#8d5a3b", "hair": "#16110f", "shirt": "#f2b134", "shirt2": "#c98e1c", "pants": "#2f5d8a", "shoes": "#d9d2c3", "eye": "#1d1410", "outline": "#1a1313", "accent": "#e4572e" },
-  "voice": "voice_juno"
+  "build": "kid",
+  "scale": 0.92,
+  "options": {
+    "hair": "bun",
+    "top": "tee",
+    "bottom": "shorts",
+    "headwear": "cap",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#8d5a3b",
+    "hair": "#16110f",
+    "brow": "#16110f",
+    "eye": "#2b1a10",
+    "top": "#f2b134",
+    "top2": "#c98e1c",
+    "bottom": "#2f5d8a",
+    "shoes": "#e4572e",
+    "accent": "#e4572e"
+  },
+  "voice": "blip_squeak"
 }

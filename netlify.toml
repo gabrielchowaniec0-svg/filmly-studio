@@ -1,8 +1,11 @@
 # Filmly Studio is a zero-dependency static site (plain ES modules, no bundler).
-# The only build step regenerates the asset manifest so new files in src/assets and films/ are picked up.
+# The build step only regenerates the asset manifest so new files in src/assets and films/ are picked up.
 [build]
   command = "node scripts/build-manifest.mjs"
   publish = "."
+
+[functions]
+  directory = "netlify/functions"
 
 [[headers]]
   for = "/*"

@@ -26,13 +26,25 @@ test('rig: bones are parent-first, parts reference real bones and slots', () => 
       assert.ok(seen.has(p.bone), `part ${p.id} uses unknown bone ${p.bone}`);
       if (p.slot) {
         assert.ok(rig.slots[p.slot], `part ${p.id} uses unknown slot ${p.slot}`);
-        assert.ok(rig.slots[p.slot].options.includes(p.option), `part ${p.id}: option ${p.option} not in slot ${p.slot}`);
+        for (const o of [].concat(p.option)) assert.ok(rig.slots[p.slot].options.includes(o), `part ${p.id}: option ${o} not in slot ${p.slot}`);
       }
     }
-    // every non-"none" slot option should draw something, except hair "bald", outfit "tee", accessory "none"
-    const exempt = new Set(['hair:bald', 'outfit:tee', 'accessory:none']);
+    // every slot option (except "none"-like ones) must draw something
+    const exempt = new Set(['hair:bald', 'bottom:bare']);
+    const has = (want, o) => (Array.isArray(want) ? want.includes(o) : want === o);
     for (const [slot, def] of Object.entries(rig.slots))
-      for (const o of def.options) if (!exempt.has(`${slot}:${o}`)) assert.ok(rig.parts.some((p) => p.slot === slot && p.option === o), `slot ${slot} option ${o} has no parts`);
+      for (const o of def.options) {
+        if (o === 'none' || exempt.has(`${slot}:${o}`)) continue;
+        assert.ok(rig.parts.some((p) => (p.slot === slot && has(p.option, o)) || (p.when && p.when[slot] && has(p.when[slot], o))), `slot ${slot} option ${o} has no parts`);
+      }
+    // clip parts reference real parts on the same rig
+    const ids2 = new Set(rig.parts.map((p) => p.id));
+    for (const p of rig.parts) if (p.clip) assert.ok(ids2.has(p.clip), `part ${p.id} clips to unknown part ${p.clip}`);
+    // slot keys in clips name real slots/options
+    for (const [cid, clip] of Object.entries(rig.clips)) for (const [slot, keys] of Object.entries(clip.slots || {})) {
+      assert.ok(rig.slots[slot], `${cid}: unknown slot ${slot}`);
+      for (const [, o] of keys) assert.ok(o === null || rig.slots[slot].options.includes(o), `${cid}: ${slot}=${o}`);
+    }
   }
 });
 
@@ -64,10 +76,12 @@ test('characters: valid rig, slot options, complete palette, real voice', () => 
     assert.ok(rig, `${c.id}: unknown rig ${c.rig}`);
     for (const [slot, opt] of Object.entries(c.options)) assert.ok(rig.slots[slot]?.options.includes(opt), `${c.id}: bad ${slot}=${opt}`);
     const used = new Set();
-    const scan = (v) => { if (typeof v === 'string' && v[0] === '$') used.add(v.slice(1)); else if (v && typeof v === 'object') Object.values(v).forEach(scan); };
+    const scan = (v) => { if (typeof v === 'string' && v[0] === '$') used.add(/^\$(\w+)/.exec(v)[1]); else if (v && typeof v === 'object') Object.values(v).forEach(scan); };
     scan(rig);
     for (const k of used) assert.ok(c.palette[k], `${c.id}: palette missing "${k}"`);
     assert.ok(A.voices[c.voice], `${c.id}: unknown voice ${c.voice}`);
+    assert.ok(!c.build || rig.builds[c.build], `${c.id}: unknown build ${c.build}`);
+    for (const k of rig.palette) assert.ok(c.palette[k], `${c.id}: palette should define ${k}`);
   }
 });
 
@@ -76,6 +90,16 @@ test('scenes: floorY on stage, shapes valid', () => {
     assert.ok(s.floorY > 300 && s.floorY < 1080, `${s.id} floorY`);
     for (const l of s.layers) assert.ok(['rect', 'ellipse', 'poly', 'path'].includes(l.type), `${s.id}: bad layer type ${l.type}`);
   }
+});
+
+test('humanoid.json is generated from scripts/rigs/humanoid.mjs (run it after editing)', async () => {
+  const { default: gen } = await import('../scripts/rigs/humanoid.mjs');
+  assert.deepEqual(readJSON('src/assets/rigs/humanoid.json'), JSON.parse(JSON.stringify(gen)));
+});
+
+test('voice presets reference real providers', async () => {
+  const { PROVIDERS } = await import('../src/tts/catalog.js');
+  for (const v of Object.values(A.voices)) assert.ok(PROVIDERS[v.engine], `${v.id}: unknown engine ${v.engine}`);
 });
 
 test('transitions are functions', () => {

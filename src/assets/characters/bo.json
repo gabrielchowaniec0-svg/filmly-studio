@@ -1,9 +1,29 @@
 {
   "id": "bo",
   "name": "Bo",
+  "about": "Laid-back, a little sarcastic.",
   "rig": "humanoid",
-  "scale": 1.04,
-  "options": { "hair": "spiky", "outfit": "hoodie", "accessory": "glasses" },
-  "palette": { "skin": "#c68a5e", "hair": "#1e1a1a", "shirt": "#3fa796", "shirt2": "#2d7f72", "pants": "#4d4f5c", "shoes": "#f4f1ea", "eye": "#241a14", "outline": "#1c1717", "accent": "#202a44" },
-  "voice": "voice_bo"
+  "build": "regular",
+  "scale": 1,
+  "options": {
+    "hair": "spiky",
+    "top": "hoodie",
+    "eyewear": "glasses"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#d64545",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#c68a5e",
+    "hair": "#1e1a1a",
+    "brow": "#1e1a1a",
+    "eye": "#3a2618",
+    "top": "#3fa796",
+    "top2": "#2d7f72",
+    "bottom": "#4d4f5c",
+    "shoes": "#f4f1ea",
+    "accent": "#202a44"
+  },
+  "voice": "blip_mellow"
 }

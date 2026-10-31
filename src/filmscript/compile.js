@@ -3,6 +3,7 @@ import { FSError } from './parse.js';
 import { estimateSpeechDuration } from '../engine/lipsync.js';
 import { MOODS, STAGE_W } from '../engine/timeline.js';
 import { TRANSITIONS } from '../assets/transitions/index.js';
+import { PROVIDERS, parseVoiceSpec, needsAudio } from '../tts/catalog.js';
 
 function lev(a, b) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
@@ -24,7 +25,8 @@ const list = (xs) => xs.slice(0, 12).join(', ') + (xs.length > 12 ? ', …' : ''
 
 /**
  * assets: { rigs, characters, scenes, voices } (voices keyed by id)
- * opts: { audioDuration?: (path) => seconds | null }
+ * opts: { audioDuration?: (path) => seconds | null, lineAudio?: (voice, text) => {duration, env} | null }
+ * Result: { film, errors, warnings, lines:[{voice, text, line}] }  (lines = every spoken line, for TTS generation)
  */
 export function compile(ast, assets, opts = {}) {
   const errors = [];
@@ -39,12 +41,19 @@ export function compile(ast, assets, opts = {}) {
   if (Math.abs(aspect - 16 / 9) > 0.01) err(meta.line, `Only 16:9 films are supported for now (got ${meta.width}x${meta.height}). Try 1920x1080, 2560x1440, 3840x2160, 7680x4320.`);
   if (meta.fps < 1 || meta.fps > 480) err(meta.line, 'fps must be between 1 and 480');
 
-  const film = { meta: { title: meta.title, width: meta.width, height: meta.height, fps: meta.fps }, fadeIn: 0, fadeOut: 0, scenes: [], duration: 0 };
+  const film = { meta: { title: meta.title, width: meta.width, height: meta.height, fps: meta.fps }, fadeIn: 0, fadeOut: 0, scenes: [], duration: 0, characters: {} };
+  const lines = [];
+  const voiceDefs = {};
   let pending = null;
+  const rigFor = (charObj) => assets.rigs[charObj.rig];
+  const charOf = (id) => film.characters[id] || assets.characters[id];
+  const allCharIds = () => [...new Set([...Object.keys(film.characters), ...Object.keys(assets.characters)])];
 
   for (const item of ast.items) {
     try {
-      if (item.kind === 'fade') { if (item.dir === 'in') film.fadeIn = item.dur; else film.fadeOut = item.dur; }
+      if (item.kind === 'voicedef') defineVoice(item);
+      else if (item.kind === 'chardef') defineCharacter(item);
+      else if (item.kind === 'fade') { if (item.dir === 'in') film.fadeIn = item.dur; else film.fadeOut = item.dur; }
       else if (item.kind === 'transition') {
         if (!TRANSITIONS[item.name]) throw new FSError(`Unknown transition "${item.name}".${suggest(item.name, Object.keys(TRANSITIONS))} Available: ${list(Object.keys(TRANSITIONS))}`, item.line);
         if (film.scenes.length === 0) warn(item.line, 'A transition before the first scene is ignored (use "fade in 1s" to fade up from black)');
@@ -74,7 +83,63 @@ export function compile(ast, assets, opts = {}) {
   const last = film.scenes[film.scenes.length - 1];
   film.duration = last ? last.start + last.duration : 0;
   film.uses = Object.fromEntries(Object.entries(uses).map(([k, v]) => [k, [...v]]));
-  return { film: errors.length ? null : film, errors, warnings };
+  return { film: errors.length ? null : film, errors, warnings, lines };
+
+  // ------------------------------------------------------------------------------------------
+  function resolveVoice(ref, line) {
+    if (ref && typeof ref === 'object') return ref;
+    if (voiceDefs[ref]) return voiceDefs[ref];
+    if (assets.voices[ref]) return { id: ref, ...assets.voices[ref] };
+    const spec = parseVoiceSpec(ref);
+    if (spec) return { id: ref, ...spec };
+    const names = [...Object.keys(voiceDefs), ...Object.keys(assets.voices)];
+    const provHint = String(ref).includes(':') ? ` Providers: ${list(Object.keys(PROVIDERS))}.` : '';
+    throw new FSError(`Unknown voice "${ref}".${suggest(String(ref), names)} Use a provider voice like openai:coral, or one of: ${list(names)}.${provHint}`, line);
+  }
+  function defineVoice(it) {
+    if (voiceDefs[it.name]) throw new FSError(`Voice "${it.name}" is already defined`, it.line);
+    const base = resolveVoice(it.spec, it.line);
+    const meta = PROVIDERS[base.engine];
+    const v = { ...base, id: it.name, name: it.name };
+    for (const [k, val] of Object.entries(it.props)) {
+      if (meta && !meta.params.some((p) => p.key === k)) {
+        throw new FSError(`"${k}" isn't an option for ${meta.label} voices.${suggest(k, meta.params.map((p) => p.key))} Options: ${meta.params.map((p) => p.key).join(', ') || '(none)'}`, it.line);
+      }
+      v[k] = val;
+    }
+    voiceDefs[it.name] = v;
+  }
+  function defineCharacter(it) {
+    if (film.characters[it.name] || assets.characters[it.name]) throw new FSError(`Character "${it.name}" already exists — pick a new id`, it.line);
+    const base = charOf(it.base);
+    if (!base) throw new FSError(`Unknown character "${it.base}".${suggest(it.base, allCharIds())} Available: ${list(allCharIds())}`, it.line);
+    const rig = rigFor(base);
+    const c = JSON.parse(JSON.stringify(base));
+    c.id = it.name;
+    c.name = it.props.name || it.name;
+    for (const [k, val] of Object.entries(it.props)) {
+      if (k === 'name') continue;
+      if (k === 'build') {
+        if (!rig.builds?.[val]) throw new FSError(`Unknown build "${val}".${suggest(String(val), Object.keys(rig.builds || {}))} Builds: ${list(Object.keys(rig.builds || {}))}`, it.line);
+        c.build = val;
+      } else if (k === 'scale') c.scale = +val;
+      else if (k === 'voice') c.voice = resolveVoice(String(val), it.line);
+      else if (k.startsWith('color.')) {
+        const key = k.slice(6);
+        if (!(rig.palette || []).includes(key)) throw new FSError(`Unknown color "${key}".${suggest(key, rig.palette || [])} Colors: ${list(rig.palette || [])}`, it.line);
+        if (!/^#[0-9a-fA-F]{3,8}$/.test(String(val))) throw new FSError(`Colors look like #ff8800 (got "${val}")`, it.line);
+        c.palette[key] = val;
+      } else if (rig.slots[k]) {
+        if (!rig.slots[k].options.includes(val)) throw new FSError(`"${val}" isn't a ${k} option.${suggest(String(val), rig.slots[k].options)} Options: ${list(rig.slots[k].options)}`, it.line);
+        c.options[k] = val;
+      } else {
+        const keys = [...Object.keys(rig.slots), 'build', 'scale', 'voice', 'name', ...(rig.palette || []).map((p) => 'color.' + p)];
+        throw new FSError(`Unknown character setting "${k}".${suggest(k, keys)} Try: ${list(keys)}`, it.line);
+      }
+    }
+    film.characters[it.name] = c;
+    uses.characters.add(it.base);
+  }
 
   // ------------------------------------------------------------------------------------------
   function compileScene(sc, transition) {
@@ -95,7 +160,7 @@ export function compile(ast, assets, opts = {}) {
       if (!cast[name]) throw new FSError(`Unknown actor "${name}" in scene "${sc.id}".${suggest(name, castOrder)} Cast them first: cast ${name}: <character> at 50`, line);
       return cast[name];
     };
-    const rigOf = (name) => assets.rigs[assets.characters[cast[name].char].rig];
+    const rigOf = (name) => assets.rigs[charOf(cast[name].char).rig];
     const push = (e, end) => { events.push(e); maxEnd = Math.max(maxEnd, end ?? e.t); };
     const advance = (it, dur) => { if (!it.concurrent) now += dur; maxEnd = Math.max(maxEnd, now); };
 
@@ -113,9 +178,9 @@ export function compile(ast, assets, opts = {}) {
       switch (it.kind) {
         case 'cast': {
           if (cast[it.name]) throw new FSError(`Actor "${it.name}" is already cast in this scene`, it.line);
-          const char = assets.characters[it.char];
-          if (!char) throw new FSError(`Unknown character "${it.char}".${suggest(it.char, Object.keys(assets.characters))} Available: ${list(Object.keys(assets.characters))}`, it.line);
-          uses.characters.add(it.char);
+          const char = charOf(it.char);
+          if (!char) throw new FSError(`Unknown character "${it.char}".${suggest(it.char, allCharIds())} Available: ${list(allCharIds())}`, it.line);
+          if (assets.characters[it.char]) uses.characters.add(it.char);
           const x = (it.x / 100) * STAGE_W;
           const facing = it.props.facing || (it.x > 50 ? 'left' : 'right');
           if (facing !== 'left' && facing !== 'right') throw new FSError('facing must be left or right', it.line);
@@ -127,21 +192,32 @@ export function compile(ast, assets, opts = {}) {
         }
         case 'say': {
           const a = need(it.actor, it.line);
-          const char = assets.characters[a.char];
-          const voiceId = it.props.voice || char.voice;
-          const voice = assets.voices[voiceId];
-          if (!voice) throw new FSError(`Unknown voice "${voiceId}".${suggest(String(voiceId), Object.keys(assets.voices))} Available: ${list(Object.keys(assets.voices))}`, it.line);
-          uses.voices.add(voiceId);
-          let audio = it.props.audio;
+          const char = charOf(a.char);
+          const voice = resolveVoice(it.props.voice || char.voice || 'blip', it.line);
+          uses.voices.add(voice.id || `${voice.engine}:${voice.voice}`);
+          const audio = it.props.audio;
           if (audio) uses.audio.add(audio);
-          let dur = it.props.for;
+          let dur = it.props.for, env = null;
           if (dur == null && audio && opts.audioDuration) dur = opts.audioDuration(audio);
-          if (dur == null) dur = estimateSpeechDuration(it.text, voice.rate || 1);
+          if (dur == null && !audio && needsAudio(voice) && opts.lineAudio) {
+            const info = opts.lineAudio(voice, it.text);
+            if (info) { dur = info.duration; env = info.env || null; }
+          }
+          if (dur == null) dur = estimateSpeechDuration(it.text, +(voice.speed || voice.rate) || 1);
+          if (!audio) lines.push({ voice, text: it.text, line: it.line });
           const mood = it.props.mood ? checkMood(it.props.mood, it.line) : null;
           if (mood) push({ type: 'mood', t: now, actor: it.actor, mood });
-          push({ type: 'say', t: now, actor: it.actor, text: it.text, dur, voice: voiceId, audio: audio || null, still: !!it.props.still }, now + dur);
+          if (it.props.gesture && !rigOf(it.actor).clips[it.props.gesture]) throw new FSError(`Unknown gesture "${it.props.gesture}".${suggest(String(it.props.gesture), Object.keys(rigOf(it.actor).clips))}`, it.line);
+          push({ type: 'say', t: now, actor: it.actor, text: it.text, dur, voice, env, audio: audio || null, still: !!it.props.still, gesture: it.props.gesture || null, energy: it.props.energy != null ? +it.props.energy : undefined }, now + dur);
           touched.add(it.actor);
           advance(it, dur + (it.props.gap ?? 0.15));
+          break;
+        }
+        case 'look': {
+          need(it.actor, it.line);
+          const ok = ['left', 'right', 'up', 'down', 'camera', 'center', 'auto'];
+          if (!ok.includes(it.target)) need(it.target, it.line);
+          push({ type: 'look', t: now, actor: it.actor, target: it.target });
           break;
         }
         case 'move': {
@@ -152,7 +228,7 @@ export function compile(ast, assets, opts = {}) {
             const o = need(it.target.actor, it.line);
             const ox = pos[it.target.actor].x;
             const dir = Math.sign(ox - from.x) || 1;
-            tx = ox - dir * 150 * (assets.characters[a.char].scale || 1);
+            tx = ox - dir * 150 * (charOf(a.char).scale || 1);
             ty = it.target.y ?? pos[it.target.actor].y;
           } else tx = (it.target.x / 100) * STAGE_W;
           const clipId = it.mode === 'runs' ? 'run' : it.mode === 'walks' ? 'walk' : null;

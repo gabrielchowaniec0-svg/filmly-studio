@@ -1,42 +1,61 @@
-# Hello, Filmly — a tiny demo that shows most FilmScript features.
+# Hello, Filmly — a short demo of most FilmScript features.
+# Voices: these use the built-in blip synth so the film exports with sound out of the box.
+# Try swapping in real TTS: open Voice Lab, or change a line to  voice=kokoro:af_heart  (free, in-browser).
 film "Hello, Filmly" 1920x1080 @30
 fade in 0.8s
+voice host = blip_bright
+character rosa from priya hair=curly top=suit color.top=#2d6a8a color.top2=#f2b134 build=regular
 
 scene living bg=living_room {
   cast mira: mira at 22
-  cast bo: bo at 78 hidden
-  cast juno: juno at 55,20 hidden
+  cast bo: bo at 80 hidden
 
   title "Hello, Filmly" 2.2s
   mira feels happy
-  mira: "Hi! I'm Mira, and this is a film made from plain text."
-  bo enters from right over 2s &
-  mira waves
-  bo: "And I'm Bo. Those files you're reading are the whole movie."
-  bo feels surprised
+  mira waves &
+  mira: "Hi! I'm Mira. This whole film is just a text file." voice=host
+  bo enters from right over 2.2s &
+  wait 1.2s
+  mira looks at bo
+  bo: "And I'm Bo. Every blink, step and lip shape is generated."
+  bo plays cross_arms for 2.5s &
   mira: "Wait... was that a camera move?" mood=surprised
-  camera zoom=1.5 x=30 y=60 over 1.5s
-  mira: "Oh! It was."
+  camera zoom=1.45 x=32 y=58 over 1.4s
+  mira laughs
+  mira: "It was!" mood=joy
   camera zoom=1 x=50 y=50 over 1s &
-  mira walks to 40 over 1.2s
+  mira walks to 42 over 1.4s
   bo shrugs
+  bo: "Want to see the forest?"
+  mira nods
   caption "Characters, voices, scenes and transitions are all just assets." 3s
 }
 
-transition iris 1s
+transition iris 1.1s
 
-scene night bg=night_forest {
-  cast juno: juno at 20
-  cast otto: otto at 80 facing=left
+scene forest bg=night_forest {
+  cast juno: juno at 18
+  cast otto: otto at 82 facing=left
+  cast rosa: rosa at 60 hidden
 
   juno: "Is this the forest from the map?"
-  otto: "Quiet now. Walk with me." mood=sad
+  otto feels worried
+  otto thinks for 2s &
+  otto: "Hmm. Quiet now. Walk with me."
   par {
-    juno walks to 62 over 3s
-    otto walks to 82 over 3s
+    juno walks to 46 over 2.6s
+    otto walks to 70 over 2.6s
   }
-  juno plays cheer
-  caption "Export to MP4 at any resolution." 2.5s
+  rosa enters from right over 1.6s &
+  juno looks at rosa
+  rosa: "You two! You're late for the show!"
+  juno feels joy
+  juno jumps
+  otto feels happy
+  juno dances &
+  rosa claps &
+  otto: "Ha! Well then, let's go."
+  caption "Export to MP4 — 720p to 8K." 2.5s
 }
 
 fade out 0.8s

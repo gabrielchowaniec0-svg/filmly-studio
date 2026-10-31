@@ -1,9 +1,30 @@
 {
   "id": "otto",
   "name": "Otto",
+  "about": "Gentle grandfather type.",
   "rig": "humanoid",
-  "scale": 1.12,
-  "options": { "hair": "bald", "outfit": "tee", "accessory": "glasses" },
-  "palette": { "skin": "#f0d2b8", "hair": "#d8d8d8", "shirt": "#7a8f5a", "shirt2": "#5f7244", "pants": "#6b5a47", "shoes": "#3a2e26", "eye": "#2b2b33", "outline": "#2a2220", "accent": "#7b4b2a" },
-  "voice": "voice_otto"
+  "build": "round",
+  "scale": 1,
+  "options": {
+    "hair": "bald",
+    "top": "sweater",
+    "facial": "mustache",
+    "eyewear": "round"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#2a211b",
+    "outline": "#2a1d1d",
+    "frame": "#7b4b2a",
+    "skin": "#f6d3b8",
+    "hair": "#cfcfcf",
+    "brow": "#b9b9b9",
+    "eye": "#4a5a6b",
+    "top": "#7a8f5a",
+    "top2": "#efe6c8",
+    "bottom": "#6b5a47",
+    "shoes": "#3a2e26",
+    "accent": "#7b4b2a"
+  },
+  "voice": "blip_deep"
 }

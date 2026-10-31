@@ -7,7 +7,10 @@ import { mixAudio } from './engine/audio.js';
 import { TRANSITIONS } from './assets/transitions/index.js';
 import { drawCharacterThumb, drawSceneThumb } from './editor/thumbs.js';
 import { exportFilm } from './export/exporter.js';
-import { getTtsAudio, loadTtsKey, saveTtsKey } from './engine/tts.js';
+import { lineInfo, lineBytes, generateLines, speakBrowser, stopBrowserSpeech } from './tts/index.js';
+import { needsAudio, PROVIDERS } from './tts/catalog.js';
+import { openVoiceLab } from './editor/voicelab.js';
+import { openCreator } from './editor/creator.js';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -15,7 +18,7 @@ const els = {
   tabs: $('assetTabs'), list: $('assetList'), filmSelect: $('filmSelect'),
   expBar: $('expBar'), expStatus: $('expStatus'), btnExport: $('btnExport'), btnCancel: $('btnCancel'),
 };
-const state = { assets: null, film: null, errors: [], t: 0, playing: false, tab: 'characters', audioMix: null, audioKey: '', audioCtx: null, audioSrc: null, startedAt: 0, startT: 0 };
+const state = { assets: null, film: null, lines: [], errors: [], t: 0, speechTimers: [], playing: false, tab: 'characters', audioMix: null, audioKey: '', audioCtx: null, audioSrc: null, startedAt: 0, startT: 0 };
 const KEY = 'filmly.script.v1';
 
 // ---- boot ------------------------------------------------------------------------------------
@@ -49,7 +52,8 @@ function recompile() {
   const src = els.editor.value;
   try { localStorage.setItem(KEY, src); } catch { /* storage may be blocked */ }
   const t0 = performance.now();
-  const r = compileSource(src, state.assets);
+  const r = compileSource(src, state.assets, { lineAudio: lineInfo });
+  state.lines = r.lines || [];
   state.errors = [...r.errors, ...r.warnings];
   if (r.film) {
     state.film = r.film;
@@ -59,7 +63,38 @@ function recompile() {
   }
   drawProblems(r, performance.now() - t0);
   updateGutter();
+  updateVoiceStatus();
   draw();
+}
+
+// ---- voices ----------------------------------------------------------------------------------
+const pendingLines = () => state.lines.filter((l) => needsAudio(l.voice) && !lineInfo(l.voice, l.text));
+function updateVoiceStatus(msg) {
+  const el = $('voiceStatus');
+  if (!el) return;
+  if (msg) { el.textContent = msg; return; }
+  const engines = [...new Set(state.lines.map((l) => l.voice.engine))];
+  const p = pendingLines().length;
+  el.textContent = `${state.lines.length} line(s) · ${engines.map((e) => PROVIDERS[e]?.label.split(' (')[0] || e).join(', ') || 'no dialogue'}${p ? ` · ${p} need generating` : ''}`;
+  $('btnVoices').classList.toggle('attn', p > 0);
+}
+let generating = null;
+async function ensureVoices() {
+  if (generating) return generating;
+  const todo = pendingLines();
+  if (!todo.length) return { failed: [] };
+  generating = (async () => {
+    const r = await generateLines(todo, {
+      onProgress: (p) => updateVoiceStatus(p.model ? `Downloading voice model… ${Math.round(p.model.progress || 0)}%` : `Generating voices ${p.done}/${p.total}…`),
+    });
+    recompile();
+    if (r.failed.length) {
+      const first = r.failed[0];
+      updateVoiceStatus(`⚠ ${r.failed.length} line(s) failed (line ${first.line}): ${first.error}`);
+    } else updateVoiceStatus();
+    return r;
+  })();
+  try { return await generating; } finally { generating = null; }
 }
 
 function drawProblems(r, ms) {
@@ -126,12 +161,19 @@ async function play() {
   if (state.t >= state.film.duration - 0.01) state.t = 0;
   state.playing = true;
   els.play.textContent = '❚❚ Pause';
+  if (pendingLines().length) {
+    els.play.textContent = '… voices';
+    await ensureVoices();
+    if (!state.playing) return;
+    els.play.textContent = '❚❚ Pause';
+  }
   state.startT = state.t;
   state.startedAt = performance.now();
+  scheduleBrowserSpeech(state.t);
   try {
     const key = JSON.stringify(state.film);
     if (state.audioKey !== key) {
-      state.audioMix = await mixAudio(state.film, renderAssets(state.assets), { tts: ttsHook, onWarning: (m) => console.warn(m) });
+      state.audioMix = await mixAudio(state.film, renderAssets(state.assets), { tts: lineBytes, onWarning: (m) => console.warn(m) });
       state.audioKey = key;
     }
     if (state.audioMix && state.playing) {
@@ -150,13 +192,23 @@ async function play() {
     }
   } catch (e) { console.warn('audio unavailable', e); }
 }
+function scheduleBrowserSpeech(from) {
+  for (const sc of state.film.scenes) for (const e of sc.events) {
+    if (e.type !== 'say' || e.voice?.engine !== 'webspeech') continue;
+    const at = sc.start + e.t - from;
+    if (at < -0.05) continue;
+    state.speechTimers.push(setTimeout(() => state.playing && speakBrowser(e.text, e.voice), Math.max(0, at * 1000)));
+  }
+}
 function pause() {
+  state.speechTimers.forEach(clearTimeout);
+  state.speechTimers = [];
+  stopBrowserSpeech();
   state.playing = false;
   els.play.textContent = '▶ Play';
   if (state.audioSrc) { try { state.audioSrc.stop(); } catch { /* already stopped */ } state.audioSrc = null; }
 }
 
-const ttsHook = (cue, voice) => getTtsAudio(cue, voice);
 
 // ---- asset browser ---------------------------------------------------------------------------
 const TABS = ['characters', 'scenes', 'voices', 'transitions', 'clips', 'moods'];
@@ -179,8 +231,9 @@ function showTab(tab) {
     return d;
   };
   if (tab === 'characters') {
+    add(`<b>＋ Character Creator</b><div class="id">mix hair, outfits, colours, body builds</div>`, () => openCreator(host()), true);
     for (const c of Object.values(a.characters)) {
-      const d = add(`<canvas width="200" height="260"></canvas><b>${c.name}</b><div class="id">${c.id} · ${c.options.hair}/${c.options.outfit}</div>`, () => insertAtCursor(`  cast ${c.id}: ${c.id} at 50\n`));
+      const d = add(`<canvas width="200" height="260"></canvas><b>${c.name}</b><div class="id">${c.id} · ${c.build || 'regular'}</div>`, () => insertAtCursor(`  cast ${c.id}: ${c.id} at 50\n`));
       drawCharacterThumb(d.querySelector('canvas'), a, c.id);
     }
   } else if (tab === 'scenes') {
@@ -189,20 +242,38 @@ function showTab(tab) {
       drawSceneThumb(d.querySelector('canvas'), a, s.id);
     }
   } else if (tab === 'voices') {
+    add(`<b>🎙 Open Voice Lab</b><div class="id">${Object.keys(PROVIDERS).length} engines: OpenAI, ElevenLabs, Google, Gemini, Azure, Polly, Deepgram, Cartesia, Hume, Fish, LMNT, Kokoro (free), your own server…</div>`, () => openVoiceLab(host()), true);
     for (const v of Object.values(a.voices)) add(`<b>${v.name}</b><div class="id">voice=${v.id} · ${v.engine}${v.engine === 'webspeech' ? ' (preview only)' : ''}</div>`, () => insertAtCursor(` voice=${v.id}`, true), true);
-    add(`<b>ElevenLabs API key</b><div class="id">stored only in this browser — click to set</div>`, () => { const k = prompt('ElevenLabs API key (kept in your browser only):', loadTtsKey()); if (k !== null) saveTtsKey(k.trim()); }, true);
   } else if (tab === 'transitions') {
     for (const [id, t] of Object.entries(TRANSITIONS)) add(`<b>${t.label}</b><div class="id">transition ${id} 1s</div>`, () => insertAtCursor(`transition ${id} 1s\n`), true);
   } else if (tab === 'clips') {
     const rig = Object.values(a.rigs)[0];
     for (const [id, c] of Object.entries(rig.clips)) add(`<b>${id}</b><div class="id">${c.overlay ? 'gesture' : 'base loop'} · ${c.duration}s</div>`, () => insertAtCursor(`  ${firstActor()} plays ${id}\n`), true);
   } else {
-    for (const m of ['neutral', 'happy', 'joy', 'sad', 'angry', 'surprised']) add(`<b>${m}</b><div class="id">${firstActor()} feels ${m}</div>`, () => insertAtCursor(`  ${firstActor()} feels ${m}\n`), true);
+    for (const m of ['neutral', 'happy', 'joy', 'sad', 'angry', 'surprised', 'worried', 'sleepy']) add(`<b>${m}</b><div class="id">${firstActor()} feels ${m}</div>`, () => insertAtCursor(`  ${firstActor()} feels ${m}\n`), true);
   }
 }
 function firstActor() {
   const m = /^\s*cast\s+([A-Za-z_][\w-]*)\s*:/m.exec(els.editor.value);
   return m ? m[1] : 'actor';
+}
+function host() {
+  return {
+    assets: state.assets,
+    insert: (text, mode) => (mode === 'top' ? insertAfterHeader(text) : insertAtCursor(text, mode === 'inline')),
+    onSaved: () => { state.audioKey = ''; recompile(); },
+    toast: (m) => flash(m),
+  };
+}
+function insertAfterHeader(text) {
+  const ed = els.editor;
+  const lines = ed.value.split('\n');
+  let i = lines.findIndex((l) => /^\s*film\s+"/.test(l));
+  i = i < 0 ? 0 : i + 1;
+  while (i < lines.length && /^\s*(fade|voice|character|let)\b/.test(lines[i])) i++;
+  lines.splice(i, 0, text.replace(/\n$/, ''));
+  ed.value = lines.join('\n');
+  recompile();
 }
 function insertAtCursor(text, inline = false) {
   const ed = els.editor;
@@ -242,6 +313,9 @@ function bind() {
     download(new Blob([els.editor.value], { type: 'text/plain' }), `${title}.fly`);
   });
   $('btnClaude').addEventListener('click', copyForClaude);
+  $('btnLab').addEventListener('click', () => openVoiceLab(host()));
+  $('btnCreator').addEventListener('click', () => openCreator(host()));
+  $('btnVoices').addEventListener('click', async () => { const r = await ensureVoices(); if (!r.failed?.length) updateVoiceStatus(pendingLines().length ? undefined : '✓ All voices ready'); });
   els.btnExport.addEventListener('click', startExport);
   els.btnCancel.addEventListener('click', () => exportWorker && exportWorker.postMessage({ type: 'cancel' }));
 }
@@ -261,7 +335,9 @@ async function copyForClaude() {
   const text = [
     '# Filmly Studio context', '', 'I am making a 2D film with Filmly Studio. Please edit my FilmScript below (or write a new one) using only the assets listed.', '',
     '## Assets',
-    `- characters: ${Object.values(a.characters).map((c) => `${c.id} (${c.options.hair}, ${c.options.outfit}${c.options.accessory !== 'none' ? ', ' + c.options.accessory : ''})`).join('; ')}`,
+    `- characters: ${Object.values(a.characters).map((c) => `${c.id} (${c.about || ''} ${Object.values(c.options).join('/')}, ${c.build || 'regular'})`).join('; ')}`,
+    `- character slots (for "character x from y ..."): ${Object.entries(Object.values(a.rigs)[0].slots).filter(([k]) => !['eyes', 'brows', 'mouth', 'handF', 'handN'].includes(k)).map(([k, s]) => `${k}=${s.options.join('|')}`).join('; ')}; build=${Object.keys(Object.values(a.rigs)[0].builds).join('|')}`,
+    `- voice engines (provider:voice): ${Object.entries(PROVIDERS).map(([k, p]) => `${k} (e.g. ${k}:${p.voices[0]?.id || '<id>'})`).join(', ')}`,
     `- backgrounds: ${Object.keys(a.scenes).join(', ')}`,
     `- voices: ${Object.values(a.voices).map((v) => `${v.id} [${v.engine}]`).join(', ')}`,
     `- transitions: ${Object.keys(TRANSITIONS).join(', ')}`,
@@ -285,10 +361,15 @@ async function startExport() {
   els.btnCancel.hidden = false;
   els.expBar.style.width = '0%';
   const warnings = [];
+  if (pendingLines().length) {
+    els.expStatus.textContent = 'Generating voices…';
+    const g = await ensureVoices();
+    if (g.failed?.length) warnings.push(`${g.failed.length} voice line(s) could not be generated: ${g.failed[0].error}`);
+  }
   els.expStatus.textContent = 'Mixing audio…';
   let audio = null;
   try {
-    audio = await mixAudio(state.film, renderAssets(state.assets), { tts: ttsHook, onWarning: (m) => warnings.push(m) });
+    audio = await mixAudio(state.film, renderAssets(state.assets), { tts: lineBytes, onWarning: (m) => warnings.push(m) });
   } catch (e) { warnings.push('Audio mix failed: ' + e.message); }
   const finish = (html) => { els.btnExport.disabled = false; els.btnCancel.hidden = true; els.expStatus.innerHTML = html; };
   const onDone = ({ blob, info }) => {

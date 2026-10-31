@@ -1,0 +1,30 @@
+{
+  "id": "dex",
+  "name": "Dex",
+  "about": "Cool and mysterious.",
+  "rig": "humanoid",
+  "build": "tall",
+  "scale": 1.02,
+  "options": {
+    "hair": "short",
+    "top": "hoodie",
+    "headwear": "beanie",
+    "eyewear": "sunglasses"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#111111",
+    "skin": "#f1c3a0",
+    "hair": "#3a2a1e",
+    "brow": "#3a2a1e",
+    "eye": "#3a2a1e",
+    "top": "#c0392b",
+    "top2": "#962d22",
+    "bottom": "#2b2b33",
+    "shoes": "#2b2b33",
+    "accent": "#2b2b33"
+  },
+  "voice": "blip_mellow"
+}

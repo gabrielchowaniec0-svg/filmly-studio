@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rig Gallery</title>
+<style>
+  body { margin: 0; background: #14151a; color: #e8eaf0; font: 14px system-ui, sans-serif; padding: 16px; }
+  h2 { font-size: 16px; margin: 18px 0 6px; color: #ffb84d; }
+  canvas { display: block; background: #23262f; border-radius: 10px; max-width: 100%; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  select, button { background: #22252e; color: #e8eaf0; border: 1px solid #2f3340; border-radius: 8px; padding: 5px 10px; }
+</style>
+</head>
+<body>
+  <div class="row"><b>Filmly rig gallery</b> <a href="../index.html" style="color:#6ea8ff">← editor</a>
+    <select id="who"></select> <select id="clip"></select> <button id="play">▶ play clip</button></div>
+  <h2>Cast</h2><canvas id="cast" width="2400" height="560"></canvas>
+  <h2>Live clip</h2><canvas id="live" width="1200" height="560"></canvas>
+  <h2>Clip strip</h2><canvas id="strip" width="2400" height="520"></canvas>
+  <h2>Faces: moods, visemes, blink</h2><canvas id="faces" width="2400" height="760"></canvas>
+  <h2>Builds &amp; outfits</h2><canvas id="builds" width="2400" height="540"></canvas>
+  <script type="module" src="gallery.js"></script>
+</body>
+</html>

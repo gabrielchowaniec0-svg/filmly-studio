@@ -1,0 +1,31 @@
+{
+  "id": "grace",
+  "name": "Grace",
+  "about": "Warm grandmother with a sharp wit.",
+  "rig": "humanoid",
+  "build": "round",
+  "scale": 0.94,
+  "options": {
+    "hair": "bun",
+    "top": "longsleeve",
+    "bottom": "skirt",
+    "eyewear": "glasses",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#2a1c14",
+    "outline": "#2a1d1d",
+    "frame": "#8a3b5c",
+    "skin": "#c68a5e",
+    "hair": "#d9d9d9",
+    "brow": "#a8a8a8",
+    "eye": "#3a2618",
+    "top": "#9b7fc4",
+    "top2": "#7d63a6",
+    "bottom": "#4b4466",
+    "shoes": "#5a3b2a",
+    "accent": "#9b7fc4"
+  },
+  "voice": "blip_warm"
+}

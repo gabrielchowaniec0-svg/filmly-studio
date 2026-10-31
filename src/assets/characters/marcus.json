@@ -1,0 +1,29 @@
+{
+  "id": "marcus",
+  "name": "Marcus",
+  "about": "Confident businessman.",
+  "rig": "humanoid",
+  "build": "broad",
+  "scale": 1.06,
+  "options": {
+    "hair": "buzz",
+    "top": "suit",
+    "facial": "beard"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#0d0a0a",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#6b4029",
+    "hair": "#141010",
+    "brow": "#141010",
+    "eye": "#21140c",
+    "top": "#253b63",
+    "top2": "#c0392b",
+    "bottom": "#253b63",
+    "shoes": "#1b1414",
+    "accent": "#c0392b"
+  },
+  "voice": "blip_deep"
+}

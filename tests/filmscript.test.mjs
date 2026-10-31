@@ -68,8 +68,8 @@ test('movement: position tweens, facing flips, walk clip + rate during move', ()
   assert.equal(Math.round(s0.x), Math.round(0.1 * 1920));
   assert.ok(s2.x > s0.x && s2.x < s5.x);
   assert.equal(Math.round(s5.x), Math.round(0.6 * 1920));
-  assert.equal(s2.baseClip, 'walk');
-  assert.equal(s5.baseClip, 'idle');
+  assert.equal(s2.layers.at(-1).clip, 'walk');
+  assert.equal(s5.layers.at(-1).clip, 'idle');
   assert.equal(s2.facing, 'right');
 });
 
@@ -98,8 +98,8 @@ test('speech drives mouth shapes and talk gesture; captions & camera evaluate', 
   const sc = f.scenes[0];
   const shapes = new Set();
   for (let t = 0; t < 2; t += 0.02) shapes.add(actorState(sc, 'a', t).face.mouth);
-  assert.ok(shapes.has('open_a') || shapes.has('open_o'), [...shapes].join());
-  assert.equal(actorState(sc, 'a', 1).overlayClip, 'talk');
+  assert.ok(shapes.has('ah') || shapes.has('oh') || shapes.has('ee'), [...shapes].join());
+  assert.match(actorState(sc, 'a', 1).layers.at(-1).clip, /^talk_/);
   assert.equal(captionsAt(sc, 0.5).length, 1);
   assert.equal(captionsAt(sc, 1.5).length, 0);
   assert.ok(cameraAt(sc, 1).zoom > 1 && cameraAt(sc, 1).zoom < 2);
@@ -110,10 +110,10 @@ test('variables, mood props, voices', () => {
   const f = ok(H + `let who = bo
 scene s bg=studio {
   cast a: $who at 50
-  a: "x" mood=sad voice=voice_otto
+  a: "x" mood=sad voice=blip_deep
 }`);
   assert.equal(f.scenes[0].cast.a.char, 'bo');
-  assert.equal(f.scenes[0].events.find((e) => e.type === 'say').voice, 'voice_otto');
+  assert.equal(f.scenes[0].events.find((e) => e.type === 'say').voice.id, 'blip_deep');
   assert.equal(actorState(f.scenes[0], 'a', 0.1).face.brows, 'sad');
 });
 
@@ -177,4 +177,104 @@ test('keyframe sampling: smooth loops are continuous at the seam', () => {
 test('parser alone reports line numbers for stray braces', () => {
   const { errors } = parse(H + '}\n');
   assert.equal(errors[0].line, 2);
+});
+
+test('voice definitions, inline provider voices, and lineAudio durations', () => {
+  const src = H + `voice narrator = openai:onyx style="calm" speed=0.9
+voice hero = kokoro:af_heart
+scene s bg=studio {
+  cast a: mira at 50
+  a: "One" voice=narrator
+  a: "Two" voice=elevenlabs:21m00Tcm4TlvDq8ikWAM
+  a: "Three" voice=hero
+  a: "Four"
+}`;
+  const lineAudio = (voice, text) => (text === 'One' ? { duration: 2.5, env: { rate: 100, data: [0, 1, 1, 0] } } : null);
+  const r = compileSource(src, A, { lineAudio });
+  assert.deepEqual(r.errors, []);
+  const says = r.film.scenes[0].events.filter((e) => e.type === 'say');
+  assert.deepEqual(says[0].voice, { id: 'narrator', name: 'narrator', engine: 'openai', voice: 'onyx', style: 'calm', speed: 0.9 });
+  assert.equal(says[0].dur, 2.5);
+  assert.equal(says[0].env.rate, 100);
+  assert.deepEqual([says[1].voice.engine, says[1].voice.voice], ['elevenlabs', '21m00Tcm4TlvDq8ikWAM']);
+  assert.equal(says[2].voice.engine, 'kokoro');
+  assert.equal(says[3].voice.engine, 'blip');
+  assert.equal(r.lines.length, 4);
+  let e = bad(H + 'voice n = openai:onyx mood=sad\nscene s bg=studio {\n}');
+  assert.match(e[0].message, /"mood" isn't an option for OpenAI/);
+  e = bad(H + 'scene s bg=studio {\n cast a: mira at 50\n a: "x" voice=opnai:coral\n}');
+  assert.match(e[0].message, /Unknown voice "opnai:coral"/);
+});
+
+test('character variants: slots, colors, build, voice', () => {
+  const f = ok(H + `character pia from priya hair=bob top=hoodie color.top=#ff8800 build=round voice=openai:nova
+scene s bg=studio {
+  cast p: pia at 50
+  p: "Hi"
+}`);
+  const c = f.characters.pia;
+  assert.equal(c.options.hair, 'bob');
+  assert.equal(c.options.top, 'hoodie');
+  assert.equal(c.palette.top, '#ff8800');
+  assert.equal(c.build, 'round');
+  assert.equal(f.scenes[0].events.find((e) => e.type === 'say').voice.voice, 'nova');
+  assert.equal(A.characters.priya.options.hair, 'ponytail', 'base asset untouched');
+  assert.match(bad(H + 'character x from priya hair=mullet\nscene s bg=studio {\n}')[0].message, /isn't a hair option/);
+  assert.match(bad(H + 'character x from priya colour.top=#fff\nscene s bg=studio {\n}')[0].message, /Unknown character setting/);
+  assert.match(bad(H + 'character x from nobody\nscene s bg=studio {\n}')[0].message, /Unknown character "nobody"/);
+});
+
+test('looks, new gesture verbs, holds', () => {
+  const f = ok(H + `scene s bg=studio {
+  cast a: mira at 30
+  cast b: bo at 70
+  a looks at b
+  a points
+  b plays cross_arms for 4s
+  a looks around
+  b claps
+}`);
+  const ev = f.scenes[0].events;
+  assert.ok(ev.some((e) => e.type === 'look' && e.target === 'b'));
+  assert.ok(ev.some((e) => e.type === 'gesture' && e.clip === 'point'));
+  assert.equal(ev.find((e) => e.clip === 'cross_arms').dur, 4);
+  assert.ok(ev.some((e) => e.clip === 'look_around'));
+  assert.ok(ev.some((e) => e.clip === 'clap'));
+});
+
+test('animation polish: blinks, turns, cross-fades, gaze at speaker', () => {
+  const f = ok(H + `scene s bg=studio {
+  cast a: mira at 20
+  cast b: bo at 80
+  wait 1s
+  a walks to 40 over 2s
+  b: "Hello over there, how are you doing today?" for=3s
+  a faces left
+  wait 1s
+}`);
+  const sc = f.scenes[0];
+  // natural blinks happen
+  let blinked = false;
+  for (let t = 0; t < sc.duration; t += 1 / 60) if (actorState(sc, 'a', t).blink > 0.9) blinked = true;
+  assert.ok(blinked);
+  // cross-fade into the walk
+  const st = actorState(sc, 'a', 1.1);
+  assert.equal(st.layers.length, 2);
+  assert.ok(st.layers[1].weight > 0 && st.layers[1].weight < 1);
+  // listeners look at the speaker (b is to the right; a faces right)
+  assert.ok(actorState(sc, 'a', 3.5).gaze[0] > 0);
+  // a quick squash turn when facing flips
+  const tFace = sc.events.find((e) => e.type === 'face' && e.dir === 'left' && e.actor === 'a').t;
+  const mid = actorState(sc, 'a', tFace + 0.1).turn;
+  assert.ok(Math.abs(mid) < 1 && Math.abs(mid) >= 0.1);
+  assert.equal(actorState(sc, 'a', tFace + 0.5).turn, -1);
+});
+
+test('lip-sync follows real audio loudness when available', async () => {
+  const { buildTalk, mouthAt } = await import('../src/engine/lipsync.js');
+  const loud = buildTalk('Banana', 1, { rate: 100, data: Array(100).fill(1) });
+  const quiet = buildTalk('Banana', 1, { rate: 100, data: Array(100).fill(0) });
+  const shapes = (talk) => new Set(Array.from({ length: 50 }, (_, i) => mouthAt(talk, i / 50)));
+  assert.ok(shapes(loud).has('ah'));
+  assert.deepEqual([...shapes(quiet)].filter((s) => s !== 'mbp'), ['rest']);
 });

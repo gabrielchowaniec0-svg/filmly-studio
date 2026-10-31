@@ -1,0 +1,29 @@
+{
+  "id": "priya",
+  "name": "Priya",
+  "about": "Smart, quick and kind.",
+  "rig": "humanoid",
+  "build": "slim",
+  "scale": 0.98,
+  "options": {
+    "hair": "ponytail",
+    "top": "longsleeve",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#7b5cd6",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#a86b45",
+    "hair": "#141012",
+    "brow": "#141012",
+    "eye": "#2a1810",
+    "top": "#7b5cd6",
+    "top2": "#5d43ad",
+    "bottom": "#2c3e66",
+    "shoes": "#f4f1ea",
+    "accent": "#ff6fa8"
+  },
+  "voice": "blip_warm"
+}

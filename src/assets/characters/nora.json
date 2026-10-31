@@ -1,0 +1,31 @@
+{
+  "id": "nora",
+  "name": "Nora",
+  "about": "Bookish and thoughtful.",
+  "rig": "humanoid",
+  "build": "regular",
+  "scale": 0.96,
+  "options": {
+    "hair": "bob",
+    "top": "sweater",
+    "bottom": "skirt",
+    "headwear": "headband",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#2a1a12",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#f6d3b8",
+    "hair": "#b5431f",
+    "brow": "#8a3216",
+    "eye": "#3c6e47",
+    "top": "#2f7d5b",
+    "top2": "#f4efe2",
+    "bottom": "#5b5b6e",
+    "shoes": "#4a2a1a",
+    "accent": "#f2c14e"
+  },
+  "voice": "blip_warm"
+}

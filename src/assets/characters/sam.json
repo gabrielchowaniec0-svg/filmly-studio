@@ -1,0 +1,29 @@
+{
+  "id": "sam",
+  "name": "Sam",
+  "about": "Little kid with big feelings.",
+  "rig": "humanoid",
+  "build": "kid",
+  "scale": 0.9,
+  "options": {
+    "hair": "short",
+    "top": "tee",
+    "bottom": "shorts"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#f6d3b8",
+    "hair": "#8a5a2b",
+    "brow": "#6b4420",
+    "eye": "#4a7a3a",
+    "top": "#48b26a",
+    "top2": "#2f8a4c",
+    "bottom": "#d9a441",
+    "shoes": "#3d7be0",
+    "accent": "#3d7be0"
+  },
+  "voice": "blip_squeak"
+}

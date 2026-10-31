@@ -50,7 +50,8 @@ instead of silently failing.
 
 ## Roadmap
 
-- [x] M0 scaffold, assets, language, renderer, MP4 export (this commit)
+- [x] M0 scaffold, assets, language, renderer, MP4 export
+- [x] M0.5 3/4-view people + Character Creator, animation polish (blending, holds, blinks, gaze, turns, visemes), 15 TTS engines + Voice Lab
 - [ ] M1 streaming/fragmented MP4 for very large outputs (File System Access API)
 - [ ] M2 more rigs (animals, props with rigs), side/3-4 view characters, speech-to-viseme from audio
 - [ ] M3 camera moves + parallax layers, particle/FX assets

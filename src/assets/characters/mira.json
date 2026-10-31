@@ -1,9 +1,31 @@
 {
   "id": "mira",
   "name": "Mira",
+  "about": "Upbeat and curious.",
   "rig": "humanoid",
+  "build": "slim",
   "scale": 1,
-  "options": { "hair": "long", "outfit": "dress", "accessory": "bow" },
-  "palette": { "skin": "#f2c7a5", "hair": "#4a2a18", "shirt": "#e0526f", "shirt2": "#b83d58", "pants": "#3b3f6b", "shoes": "#2a2438", "eye": "#3a2a20", "outline": "#2a1b1b", "accent": "#ffd166" },
-  "voice": "voice_mira"
+  "options": {
+    "hair": "long",
+    "top": "dress",
+    "bottom": "bare",
+    "headwear": "bow",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#f1c3a0",
+    "hair": "#4a2a18",
+    "brow": "#3a1f12",
+    "eye": "#6b4a2b",
+    "top": "#e0526f",
+    "top2": "#f6d6a0",
+    "bottom": "#3b3f6b",
+    "shoes": "#7a2f45",
+    "accent": "#ffd166"
+  },
+  "voice": "blip_bright"
 }

@@ -1,11 +1,27 @@
 {
-  "note": "engine: blip = synthesized offline, always exportable | file = pre-recorded audio | elevenlabs = API (needs key, audio cached then exportable) | webspeech = browser TTS, preview only (cannot be captured into MP4).",
+  "note": "Voice presets usable as voice=<id>. Any provider voice also works inline as provider:voice (e.g. voice=openai:coral). Blip voices are synthesized and always export; other engines are generated once (Voice Lab) and cached in your browser.",
   "voices": [
-    { "id": "voice_mira", "name": "Mira (bright blips)", "engine": "blip", "pitch": 330, "wave": "triangle", "rate": 1.0, "variation": 0.22 },
-    { "id": "voice_bo", "name": "Bo (mellow blips)", "engine": "blip", "pitch": 190, "wave": "square", "rate": 0.95, "variation": 0.18 },
-    { "id": "voice_juno", "name": "Juno (squeaky blips)", "engine": "blip", "pitch": 470, "wave": "sine", "rate": 1.1, "variation": 0.28 },
-    { "id": "voice_otto", "name": "Otto (deep blips)", "engine": "blip", "pitch": 120, "wave": "sawtooth", "rate": 0.85, "variation": 0.12 },
-    { "id": "narrator_webspeech", "name": "Narrator (browser TTS, preview only)", "engine": "webspeech", "pitch": 1.0, "rate": 1.0, "lang": "en-US" },
-    { "id": "narrator_elevenlabs", "name": "Narrator (ElevenLabs)", "engine": "elevenlabs", "voiceId": "REPLACE_WITH_ELEVENLABS_VOICE_ID", "model": "eleven_multilingual_v2" }
+    { "id": "blip_bright", "name": "Bright blips", "engine": "blip", "pitch": 330, "wave": "triangle", "variation": 0.22 },
+    { "id": "blip_mellow", "name": "Mellow blips", "engine": "blip", "pitch": 190, "wave": "square", "variation": 0.18 },
+    { "id": "blip_squeak", "name": "Squeaky blips", "engine": "blip", "pitch": 470, "wave": "sine", "variation": 0.28 },
+    { "id": "blip_deep", "name": "Deep blips", "engine": "blip", "pitch": 120, "wave": "sawtooth", "variation": 0.12 },
+    { "id": "blip_warm", "name": "Warm blips", "engine": "blip", "pitch": 280, "wave": "sine", "variation": 0.16 },
+    { "id": "blip_buzzy", "name": "Buzzy blips", "engine": "blip", "pitch": 230, "wave": "sawtooth", "variation": 0.24 },
+    { "id": "narrator_browser", "name": "Narrator (browser, preview only)", "engine": "webspeech", "voice": "default", "rate": 1 },
+    { "id": "kokoro_heart", "name": "Kokoro · Heart (free, in-browser)", "engine": "kokoro", "voice": "af_heart" },
+    { "id": "kokoro_michael", "name": "Kokoro · Michael (free, in-browser)", "engine": "kokoro", "voice": "am_michael" },
+    { "id": "kokoro_emma", "name": "Kokoro · Emma (free, in-browser)", "engine": "kokoro", "voice": "bf_emma" },
+    { "id": "kokoro_george", "name": "Kokoro · George (free, in-browser)", "engine": "kokoro", "voice": "bm_george" },
+    { "id": "openai_coral", "name": "OpenAI · Coral", "engine": "openai", "voice": "coral" },
+    { "id": "openai_onyx", "name": "OpenAI · Onyx (narrator)", "engine": "openai", "voice": "onyx", "style": "Warm, unhurried storyteller." },
+    { "id": "eleven_rachel", "name": "ElevenLabs · Rachel", "engine": "elevenlabs", "voice": "21m00Tcm4TlvDq8ikWAM" },
+    { "id": "eleven_adam", "name": "ElevenLabs · Adam", "engine": "elevenlabs", "voice": "pNInz6obpgDQGcFmaJgB" },
+    { "id": "gemini_kore", "name": "Gemini · Kore", "engine": "gemini", "voice": "Kore" },
+    { "id": "gemini_puck", "name": "Gemini · Puck", "engine": "gemini", "voice": "Puck" },
+    { "id": "azure_andrew", "name": "Azure · Andrew", "engine": "azure", "voice": "en-US-AndrewNeural" },
+    { "id": "azure_jenny_cheerful", "name": "Azure · Jenny (cheerful)", "engine": "azure", "voice": "en-US-JennyNeural", "style": "cheerful" },
+    { "id": "google_neural_f", "name": "Google · Neural2-F", "engine": "google", "voice": "en-US-Neural2-F" },
+    { "id": "polly_joanna", "name": "Amazon Polly · Joanna", "engine": "polly", "voice": "Joanna" },
+    { "id": "deepgram_thalia", "name": "Deepgram · Thalia", "engine": "deepgram", "voice": "aura-2-thalia-en" }
   ]
 }

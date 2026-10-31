@@ -16,8 +16,12 @@ export function lex(src, lineNo) {
   while (i < n) {
     const ch = src[i];
     if (ch === ' ' || ch === '\t' || ch === '\r') { i++; continue; }
-    if (ch === '#' || (ch === '/' && src[i + 1] === '/')) break;
     const col = i;
+    if (ch === '#' && toks.length && toks[toks.length - 1].t === 'sym' && toks[toks.length - 1].v === '=') {
+      const hm = /^#[0-9a-fA-F]{3,8}(?![\w])/.exec(src.slice(i));
+      if (hm) { toks.push({ t: 'str', v: hm[0], col }); i += hm[0].length; continue; }
+    }
+    if (ch === '#' || (ch === '/' && src[i + 1] === '/')) break;
     if (ch === '"') {
       let j = i + 1, v = '';
       while (j < n && src[j] !== '"') {
@@ -42,7 +46,7 @@ export function lex(src, lineNo) {
     }
     m = /^\$[A-Za-z_][A-Za-z0-9_]*/.exec(src.slice(i));
     if (m) { toks.push({ t: 'var', v: m[0].slice(1), col }); i += m[0].length; continue; }
-    m = /^[A-Za-z_][A-Za-z0-9_.\-]*/.exec(src.slice(i));
+    m = /^[A-Za-z_][A-Za-z0-9_.\-]*(?::[A-Za-z0-9_][A-Za-z0-9_.\-]*)*/.exec(src.slice(i));
     if (m) { toks.push({ t: 'id', v: m[0], col }); i += m[0].length; continue; }
     if ('{}:=,&@'.includes(ch)) { toks.push({ t: 'sym', v: ch, col }); i++; continue; }
     throw new FSError(`Unexpected character "${ch}"`, lineNo, col);
@@ -112,8 +116,11 @@ class Toks {
 }
 
 // ---- statements -----------------------------------------------------------------------------
-const ALIAS = { waves: 'wave', jumps: 'jump', shrugs: 'shrug', nods: 'nod', cheers: 'cheer', gestures: 'talk' };
-const ACTOR_VERBS = ['walks', 'runs', 'moves', 'enters', 'exits', 'faces', 'plays', 'feels', 'idles', 'shows', 'hides', 'says', ...Object.keys(ALIAS)];
+const ALIAS = {
+  waves: 'wave', jumps: 'jump', shrugs: 'shrug', nods: 'nod', cheers: 'cheer', gestures: 'talk', points: 'point', thinks: 'think',
+  claps: 'clap', laughs: 'laugh', bows: 'bow', dances: 'dance', facepalms: 'facepalm', gasps: 'surprised', sulks: 'sad_slump',
+};
+const ACTOR_VERBS = ['walks', 'runs', 'moves', 'enters', 'exits', 'faces', 'looks', 'plays', 'feels', 'idles', 'shows', 'hides', 'says', ...Object.keys(ALIAS)];
 
 function parseTarget(T) {
   // "60", "60,10", "25%", or an actor name
@@ -192,6 +199,13 @@ function parseActorStatement(T, actorTok) {
       node = { kind: 'play', actor, clip, dur, loop, props, concurrent: T.concurrent() };
       break;
     }
+    case 'looks': {
+      T.acceptId('at');
+      const w = T.expectId('left, right, up, down, camera, around, away, or an actor name');
+      if (w === 'around') { node = { kind: 'play', actor, clip: 'look_around', loop: false, props: {}, concurrent: T.concurrent() }; break; }
+      node = { kind: 'look', actor, target: w === 'away' ? 'center' : w === 'forward' ? 'center' : w };
+      break;
+    }
     case 'feels': {
       node = { kind: 'mood', actor, mood: T.expectId('a mood (neutral, happy, joy, sad, angry, surprised)') };
       break;
@@ -238,11 +252,31 @@ function parseStatement(T, ctx) {
       T.env[name] = v;
       return { kind: 'let', name };
     }
+    case 'voice': {
+      T.next();
+      const name = T.expectId('a voice name');
+      T.expectSym('=');
+      const spec = T.value('a voice like openai:coral');
+      if (spec.t !== 'id' && spec.t !== 'str') throw T.err('Expected a voice like openai:coral or elevenlabs:<voice id>');
+      const props = T.props();
+      T.end();
+      return { kind: 'voicedef', name, spec: spec.v, props };
+    }
+    case 'character': {
+      T.next();
+      const name = T.expectId('a new character id');
+      if (!T.acceptId('from')) throw T.err('Use: character <new-id> from <existing-character> key=value ...');
+      const base = T.expectId('an existing character id');
+      const props = T.props();
+      T.end();
+      return { kind: 'chardef', name, base, props };
+    }
     case 'cast': {
       T.next();
-      const name = T.expectId('an actor name');
-      T.expectSym(':');
-      let char = T.expectId('a character id');
+      let name = T.expectId('an actor name');
+      let char;
+      if (name.includes(':')) [name, char] = name.split(':');
+      else { T.expectSym(':'); char = T.expectId('a character id'); }
       if (char.startsWith('char.')) char = char.slice(5);
       let at = { x: 50 };
       const props = {};
@@ -382,7 +416,7 @@ export function parse(source) {
         const node = parseStatement(T, stack);
         node.line = lineNo;
         if (node.kind === 'let') continue;
-        if (node.kind === 'cast' || node.kind === 'transition' || node.kind === 'fade') {
+        if (node.kind === 'cast' || node.kind === 'transition' || node.kind === 'fade' || node.kind === 'voicedef' || node.kind === 'chardef') {
           if (node.kind === 'cast' && top.node.kind !== 'scene') throw new FSError('"cast" must be inside a scene { }', lineNo);
           if (node.kind !== 'cast' && stack.length > 1) throw new FSError(`"${node.kind}" must be between scenes, not inside one`, lineNo);
         } else if (stack.length === 1) {

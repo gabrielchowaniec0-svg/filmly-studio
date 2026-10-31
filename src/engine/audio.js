@@ -23,7 +23,7 @@ export function collectCues(film) {
 
 /**
  * Mix everything that CAN be exported into a stereo buffer.
- * opts: { sampleRate, loadAudio(path)->ArrayBuffer, tts(cue, voice)->ArrayBuffer|null, onWarning(msg) }
+ * opts: { sampleRate, loadAudio(path)->ArrayBuffer, tts(voice, text)->ArrayBuffer|null, onWarning(msg) }
  * Returns { sampleRate, channels:[L,R] } or null when the film has no exportable audio.
  */
 export async function mixAudio(film, assets, opts = {}) {
@@ -54,7 +54,7 @@ export async function mixAudio(film, assets, opts = {}) {
   for (const cue of cues) {
     try {
       if (cue.kind === 'say') {
-        const voice = assets.voices[cue.voice];
+        const voice = typeof cue.voice === 'object' ? cue.voice : assets.voices[cue.voice] || { engine: 'blip' };
         if (cue.audio) {
           const buf = await decode(cue.audio, () => load(cue.audio));
           playBuffer(ctx, master, buf, cue.t, 1);
@@ -62,16 +62,15 @@ export async function mixAudio(film, assets, opts = {}) {
         } else if (voice.engine === 'blip') {
           scheduleBlips(ctx, master, voice, cue);
           any = true;
-        } else if (voice.engine === 'elevenlabs' || voice.engine === 'file') {
-          const bytes = opts.tts ? await opts.tts(cue, voice) : null;
+        } else if (voice.engine === 'webspeech') {
+          warnOnce(`"${voice.name || voice.id || 'Browser voice'}" uses browser speech, which can't be recorded into a video. Pick a blip, Kokoro or cloud voice for export.`);
+        } else {
+          const bytes = opts.tts ? await opts.tts(voice, cue.text) : null;
           if (bytes) {
-            const key = `tts:${voice.id}:${cue.text}`;
-            const buf = await decode(key, async () => bytes);
+            const buf = await decode(`tts:${voice.engine}:${voice.voice}:${cue.text}:${JSON.stringify(voice)}`, async () => bytes);
             playBuffer(ctx, master, buf, cue.t, 1);
             any = true;
-          } else warnOnce(`Voice "${voice.name}" has no audio yet (${voice.engine}); that line will be silent in the export. Add an API key or use audio="path".`);
-        } else if (voice.engine === 'webspeech') {
-          warnOnce(`Voice "${voice.name}" uses browser speech, which can't be captured into a video. Use a blip/ElevenLabs/file voice for export.`);
+          } else warnOnce(`Some ${voice.engine} lines have no audio yet, so they'll be silent. Click "Generate voices" first.`);
         }
       } else {
         const buf = await decode(cue.src, () => load(cue.src));
@@ -102,7 +101,7 @@ function playBuffer(ctx, dest, buf, t, vol = 1, loop = false, fade = 0) {
   return src;
 }
 
-function scheduleBlips(ctx, dest, voice, cue) {
+export function scheduleBlips(ctx, dest, voice, cue) {
   const talk = buildTalk(cue.text, cue.dur);
   const blips = blipSchedule(talk, voice);
   for (const b of blips) {

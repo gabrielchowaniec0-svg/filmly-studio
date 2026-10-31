@@ -1,6 +1,6 @@
 // renderFrame(): the single entry point used by the editor preview AND the MP4 exporter.
 import { drawShape, trs, mul, IDENT } from './paint.js';
-import { drawRig, poseAt } from './rig.js';
+import { drawRig, poseAt, applyOverrides, holdTime } from './rig.js';
 import { actorState, captionsAt, cameraAt, windowsAt, STAGE_W, STAGE_H } from './timeline.js';
 import { TRANSITIONS } from '../assets/transitions/index.js';
 
@@ -64,23 +64,29 @@ function drawScene(ctx, film, assets, scene, lt) {
   states.sort((a, b) => a.st.y - b.st.y || a.idx - b.idx);
   for (const { name, st } of states) {
     const c = scene.cast[name];
-    const char = assets.characters[c.char];
+    const char = (film.characters && film.characters[c.char]) || assets.characters[c.char];
     const rig = assets.rigs[char.rig];
-    const base = { clip: rig.clips[st.baseClip] || rig.clips.idle, t: st.baseT };
-    const overlay = st.overlayClip && rig.clips[st.overlayClip]
-      ? { clip: rig.clips[st.overlayClip], t: st.overlayT, weight: st.overlayW }
-      : null;
-    const pose = poseAt(base, overlay);
+    const layers = [];
+    for (const L of st.layers) {
+      const clip = rig.clips[L.clip] || (layers.length ? null : rig.clips.idle);
+      if (!clip) continue;
+      layers.push({ clip, t: L.hold != null ? holdTime(clip, L.t, L.hold) : L.t, weight: L.weight });
+    }
+    const pose = applyOverrides(poseAt(layers), { gaze: { pos: st.gaze } });
+    pose.lidN = { ...(pose.lidN || {}), scale: [1, st.lid] };
+    pose.lidF = { ...(pose.lidF || {}), scale: [1, st.lid] };
     const depthScale = 1 + st.y * 0.002;
-    const s = (char.scale || 1) * (c.scale || 1) * depthScale;
-    const sx = st.facing === 'left' ? -s : s;
-    const placement = trs(st.x, bg.floorY + st.y * 2, 0, sx, s);
-    // soft shadow
+    const s = (char.scale || 1) * (c.scale || 1) * (rig.displayScale || 0.85) * depthScale;
+    const floor = bg.floorY + st.y * 2;
+    const placement = trs(st.x, floor, 0, s * st.turn, s);
+    // soft contact shadow (shrinks when airborne)
+    const lift = -(pose.root?.pos?.[1] || 0);
+    const k = Math.max(0.4, 1 - lift / 260);
     ctx.save();
-    ctx.globalAlpha = 0.2;
+    ctx.globalAlpha = 0.22 * k;
     ctx.fillStyle = '#000';
     ctx.beginPath();
-    ctx.ellipse(st.x, bg.floorY + st.y * 2 + 4, 62 * s, 14 * s, 0, 0, Math.PI * 2);
+    ctx.ellipse(st.x, floor + 4, 64 * s * k, 13 * s * k, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     drawRig(ctx, rig, char, pose, st.face, placement);

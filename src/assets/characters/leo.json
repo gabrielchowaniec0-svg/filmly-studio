@@ -1,0 +1,29 @@
+{
+  "id": "leo",
+  "name": "Leo",
+  "about": "Sporty and friendly.",
+  "rig": "humanoid",
+  "build": "tall",
+  "scale": 1,
+  "options": {
+    "hair": "swoop",
+    "top": "tee",
+    "bottom": "shorts"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#3d7be0",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#e0a982",
+    "hair": "#e2b84f",
+    "brow": "#b98d2f",
+    "eye": "#3d6fa8",
+    "top": "#3d7be0",
+    "top2": "#2c5fb3",
+    "bottom": "#c9b38a",
+    "shoes": "#f4f1ea",
+    "accent": "#3d7be0"
+  },
+  "voice": "blip_buzzy"
+}

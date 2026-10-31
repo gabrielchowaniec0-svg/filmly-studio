@@ -14,6 +14,8 @@
     <button id="btnNew">New</button>
     <button id="btnOpen">Open .fly…</button>
     <button id="btnSave">Save .fly</button>
+    <button id="btnCreator">🧑‍🎨 Characters</button>
+    <button id="btnLab">🎙 Voice Lab</button>
     <span class="spacer"></span>
     <button id="btnClaude" title="Copy the language guide, asset list and your script to paste into Claude">Copy context for Claude</button>
     <input type="file" id="fileInput" accept=".fly,.txt" hidden>
@@ -32,6 +34,7 @@
         <input type="range" id="scrub" min="0" max="1000" value="0">
         <span id="timeLabel" class="mono">0:00.00 / 0:00.00</span>
       </div>
+      <div class="voicebar"><button id="btnVoices" title="Generate (and cache) audio for every line that uses a TTS engine">🎙 Generate voices</button><span id="voiceStatus" class="small"></span></div>
       <details class="export" open>
         <summary>Export MP4</summary>
         <div class="grid">

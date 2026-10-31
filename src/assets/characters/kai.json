@@ -1,0 +1,29 @@
+{
+  "id": "kai",
+  "name": "Kai",
+  "about": "Creative teen who loves music.",
+  "rig": "humanoid",
+  "build": "regular",
+  "scale": 0.98,
+  "options": {
+    "hair": "curly",
+    "top": "overalls",
+    "headwear": "headphones"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#3b6ea8",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#4f2e1d",
+    "hair": "#120c0a",
+    "brow": "#120c0a",
+    "eye": "#1c120c",
+    "top": "#ff8a3d",
+    "top2": "#ff8a3d",
+    "bottom": "#3b6ea8",
+    "shoes": "#f2f2f2",
+    "accent": "#ffcf3d"
+  },
+  "voice": "blip_buzzy"
+}

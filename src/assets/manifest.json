@@ -4,9 +4,17 @@
   ],
   "characters": [
     "src/assets/characters/bo.json",
+    "src/assets/characters/dex.json",
+    "src/assets/characters/grace.json",
     "src/assets/characters/juno.json",
+    "src/assets/characters/kai.json",
+    "src/assets/characters/leo.json",
+    "src/assets/characters/marcus.json",
     "src/assets/characters/mira.json",
-    "src/assets/characters/otto.json"
+    "src/assets/characters/nora.json",
+    "src/assets/characters/otto.json",
+    "src/assets/characters/priya.json",
+    "src/assets/characters/sam.json"
   ],
   "scenes": [
     "src/assets/scenes/living_room.json",
