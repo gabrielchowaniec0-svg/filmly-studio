@@ -17,10 +17,32 @@
     "src/assets/characters/sam.json"
   ],
   "scenes": [
+    "src/assets/scenes/beach.json",
+    "src/assets/scenes/bedroom.json",
+    "src/assets/scenes/cafe.json",
+    "src/assets/scenes/castle_throne_room.json",
+    "src/assets/scenes/city_night.json",
+    "src/assets/scenes/classroom.json",
+    "src/assets/scenes/desert.json",
+    "src/assets/scenes/forest_day.json",
+    "src/assets/scenes/grocery_aisle.json",
+    "src/assets/scenes/hospital_room.json",
+    "src/assets/scenes/kitchen.json",
+    "src/assets/scenes/library.json",
     "src/assets/scenes/living_room.json",
+    "src/assets/scenes/mansion_exterior_night.json",
     "src/assets/scenes/night_forest.json",
+    "src/assets/scenes/office.json",
+    "src/assets/scenes/park_day.json",
+    "src/assets/scenes/rooftop_sunset.json",
+    "src/assets/scenes/school_hallway.json",
+    "src/assets/scenes/snowy_village.json",
+    "src/assets/scenes/spaceship_bridge.json",
+    "src/assets/scenes/spooky_mansion_hall.json",
     "src/assets/scenes/street_day.json",
-    "src/assets/scenes/studio.json"
+    "src/assets/scenes/studio.json",
+    "src/assets/scenes/theater_stage.json",
+    "src/assets/scenes/underwater.json"
   ],
   "voices": "src/assets/voices/voices.json",
   "films": [

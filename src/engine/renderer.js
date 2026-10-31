@@ -91,6 +91,8 @@ function drawScene(ctx, film, assets, scene, lt) {
     ctx.restore();
     drawRig(ctx, rig, char, pose, st.face, placement);
   }
+  // optional foreground layer of the background (drawn over the characters)
+  if (bg.front) for (const layer of bg.front) drawShape(ctx, layer, null, null);
   ctx.restore();
 
   drawCaptions(ctx, captionsAt(scene, lt));

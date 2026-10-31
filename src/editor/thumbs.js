@@ -27,5 +27,6 @@ export function drawSceneThumb(canvas, assets, sceneId) {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, STAGE_W, STAGE_H);
   for (const layer of sc.layers) drawShape(ctx, layer, null, null);
+  if (sc.front) for (const layer of sc.front) drawShape(ctx, layer, null, null);
   ctx.restore();
 }
