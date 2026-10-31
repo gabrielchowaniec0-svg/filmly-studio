@@ -69,9 +69,11 @@ function drawBuilds() {
   bg(ctx, c.width, c.height);
   const base = A.characters[who.value];
   const variants = Object.keys(rig.builds).map((b) => ({ ...base, build: b, scale: 1, _l: b }))
-    .concat(rig.slots.top.options.map((t) => ({ ...base, scale: 1, options: { ...base.options, top: t, bottom: t === 'dress' ? 'bare' : (base.options.bottom === 'bare' ? 'pants' : base.options.bottom || 'pants') }, _l: t })));
-  const step = c.width / variants.length;
-  variants.forEach((v, i) => { person(ctx, v, step * (i + 0.5), c.height - 60, 0.85, idle(), { mouth: 'smile' }); label(ctx, v._l, step * (i + 0.5), c.height - 14); });
+    .concat(rig.slots.top.options.map((t) => ({ ...base, scale: 1, options: { ...base.options, top: t, bottom: ['dress', 'sundress', 'gown'].includes(t) ? 'bare' : (base.options.bottom === 'bare' ? 'pants' : base.options.bottom || 'pants') }, _l: t })));
+  const perRow = 16, rows = Math.ceil(variants.length / perRow), rh = 540;
+  if (c.height !== rows * rh) { c.height = rows * rh; bg(ctx, c.width, c.height); }
+  const step = c.width / perRow;
+  variants.forEach((v, i) => { const x = step * ((i % perRow) + 0.5), y = rh * (Math.floor(i / perRow) + 1); person(ctx, v, x, y - 60, 0.85, idle(), { mouth: 'smile' }); label(ctx, v._l, x, y - 14); });
 }
 let raf = 0;
 function live() {

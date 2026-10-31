@@ -33,9 +33,9 @@ export const builds = {
   slim: { torso: { scale: [0.88, 1] }, hips: { scale: [0.88, 1] }, ...limbs(0.86), ...legs(0.86), armN: { scale: [0.86, 1], dpos: [4, 0] }, armF: { scale: [0.86, 1], dpos: [-3, 0] } },
   broad: { torso: { scale: [1.16, 1] }, hips: { scale: [1.06, 1] }, ...limbs(1.14), ...legs(1.08), armN: { scale: [1.14, 1], dpos: [-6, 0] }, armF: { scale: [1.14, 1], dpos: [5, 0] }, neck: { scale: [1.2, 1] } },
   round: { torso: { scale: [1.28, 1] }, hips: { scale: [1.22, 1] }, ...limbs(1.12), ...legs(1.16), armN: { scale: [1.12, 1], dpos: [-9, 2] }, armF: { scale: [1.12, 1], dpos: [8, 2] }, thighN: { scale: [1.16, 1], dpos: [-4, 0] }, thighF: { scale: [1.16, 1], dpos: [3, 0] }, neck: { scale: [1.15, 1] } },
-  tall: { ...legs(0.95, 1.1), shinN: { scale: [0.95, 1.1], dpos: [0, 8] }, shinF: { scale: [0.95, 1.1], dpos: [0, 8] }, footN: { dpos: [0, 8] }, footF: { dpos: [0, 8] }, hips: { dpos: [0, -16] }, torso: { scale: [0.96, 1.05], dpos: [0, 0] }, neck: { dpos: [0, -5] } },
+  tall: { ...legs(0.95, 1.1), shinN: { scale: [0.95, 1.1], dpos: [0, 8] }, shinF: { scale: [0.95, 1.1], dpos: [0, 8] }, footN: { dpos: [0, 8] }, footF: { dpos: [0, 8] }, hips: { dpos: [0, -16], scale: [1, 1.08] }, torso: { scale: [0.96, 1.05], dpos: [0, 0] }, neck: { dpos: [0, -5] } },
   kid: {
-    hips: { dpos: [0, 38], scale: [0.86, 0.9] }, ...legs(0.86, 0.78),
+    hips: { dpos: [0, 38], scale: [0.86, 0.8] }, ...legs(0.86, 0.78), // hips y-scale ≈ leg scale so skirts/coats keep their length
     shinN: { scale: [0.86, 0.78], dpos: [0, -17] }, shinF: { scale: [0.86, 0.78], dpos: [0, -17] },
     footN: { dpos: [0, -17] }, footF: { dpos: [0, -17] },
     torso: { scale: [0.86, 0.84] }, neck: { dpos: [0, 18] },
@@ -43,6 +43,18 @@ export const builds = {
     foreN: { scale: [0.84, 0.82], dpos: [0, -11] }, foreF: { scale: [0.84, 0.82], dpos: [0, -11] },
     handN: { dpos: [0, -10] }, handF: { dpos: [0, -10] },
     head: { bscale: [1.1, 1.1] },
+  },
+  // athletic: broad shoulders, trim waist and hips, strong limbs
+  athletic: {
+    torso: { scale: [1.12, 1.02] }, hips: { scale: [0.96, 1] }, ...limbs(1.12), ...legs(1.06),
+    armN: { scale: [1.14, 1], dpos: [-5, -2] }, armF: { scale: [1.14, 1], dpos: [5, -2] }, neck: { scale: [1.14, 1], dpos: [0, -2] },
+  },
+  // elder: slightly shorter legs, softer middle, head and shoulders carried forward (a gentle stoop)
+  elder: {
+    hips: { dpos: [0, 6], scale: [1.06, 0.96] }, ...legs(1, 1),
+    shinN: { dpos: [0, -3] }, shinF: { dpos: [0, -3] }, footN: { dpos: [0, -3] }, footF: { dpos: [0, -3] },
+    torso: { scale: [1.06, 0.95] },
+    neck: { dpos: [7, 8] }, armN: { scale: [1.02, 1], dpos: [1, 6] }, armF: { scale: [1.02, 1], dpos: [4, 6] },
   },
 };
 
