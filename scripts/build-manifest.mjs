@@ -14,6 +14,7 @@ export function buildManifest() {
     rigs: list('src/assets/rigs', '.json'),
     characters: list('src/assets/characters', '.json'),
     scenes: list('src/assets/scenes', '.json'),
+    props: list('src/assets/props', '.json'),
     voices: 'src/assets/voices/voices.json',
     films: list('films', '.fly'),
   };
@@ -22,5 +23,5 @@ export function buildManifest() {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const m = buildManifest();
   writeFileSync(join(root, 'src/assets/manifest.json'), JSON.stringify(m, null, 2) + '\n');
-  console.log(`manifest: ${m.rigs.length} rigs, ${m.characters.length} characters, ${m.scenes.length} scenes, ${m.films.length} films`);
+  console.log(`manifest: ${m.rigs.length} rigs, ${m.characters.length} characters, ${m.scenes.length} scenes, ${m.props.length} props, ${m.films.length} films`);
 }

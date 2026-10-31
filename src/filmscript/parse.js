@@ -122,7 +122,7 @@ const ALIAS = {
   salutes: 'salute', yawns: 'yawn', cries: 'cry', sobs: 'cry', beckons: 'beckon', stretches: 'stretch', stomps: 'stomp',
   cowers: 'cower', celebrates: 'celebrate', shushes: 'shush', peeks: 'peek', pleads: 'plead', begs: 'plead', prays: 'pray',
 };
-const ACTOR_VERBS = ['walks', 'runs', 'moves', 'enters', 'exits', 'faces', 'looks', 'plays', 'feels', 'idles', 'shows', 'hides', 'says', ...Object.keys(ALIAS)];
+const ACTOR_VERBS = ['walks', 'runs', 'moves', 'enters', 'exits', 'faces', 'looks', 'plays', 'feels', 'idles', 'shows', 'hides', 'says', 'holds', 'drops', 'gives', ...Object.keys(ALIAS)];
 
 function parseTarget(T) {
   // "60", "60,10", "25%", or an actor name
@@ -215,6 +215,7 @@ function parseActorStatement(T, actorTok) {
     case 'idles': node = { kind: 'play', actor, clip: 'idle', loop: true, props: {}, concurrent: false }; break;
     case 'shows': node = { kind: 'show', actor }; break;
     case 'hides': node = { kind: 'hide', actor }; break;
+    case 'holds': case 'drops': case 'gives': node = parseHoldVerb(T, actor, verb); break;
     default:
       if (ALIAS[verb]) {
         let dur;
@@ -226,6 +227,30 @@ function parseActorStatement(T, actorTok) {
   }
   T.end();
   return node;
+}
+
+// props: `mira holds cup [in near|far]`, `mira drops [cup]`, `mira gives cup to bo [in near|far]`
+function parseHoldVerb(T, actor, verb) {
+  const hand = () => {
+    if (T.acceptId('in') || T.acceptId('with')) {
+      const h = T.expectId('near or far');
+      if (h !== 'near' && h !== 'far') throw T.err(`Hand must be "near" or "far" (got "${h}")`);
+      T.acceptId('hand');
+      return h;
+    }
+    return null;
+  };
+  if (verb === 'drops') {
+    const prop = T.done || T.isSym('&') ? null : T.expectId('a prop name');
+    return { kind: 'drop', actor, prop, concurrent: T.concurrent() };
+  }
+  const prop = T.expectId(`a prop name (e.g. ${actor} ${verb} cup)`);
+  if (verb === 'gives') {
+    if (!T.acceptId('to')) throw T.err(`Use: ${actor} gives ${prop} to <actor>`);
+    const to = T.expectId('who receives it');
+    return { kind: 'give', actor, prop, to, hand: hand(), concurrent: T.concurrent() };
+  }
+  return { kind: 'holdprop', actor, prop, hand: hand(), concurrent: T.concurrent() };
 }
 
 function parseStatement(T, ctx) {
@@ -291,6 +316,43 @@ function parseStatement(T, ctx) {
       }
       if (at.actor) throw T.err('Cast position must be a number like "at 30" (percent of stage width)');
       return { kind: 'cast', name, char, x: at.x, y: at.y ?? 0, hidden, props };
+    }
+    case 'prop': {
+      // prop cup: mug at 40,10 [scale=1.2] [hidden] [front|back] [flip] [up=120] [color=#hex] [text="Hi"]
+      T.next();
+      let name = T.expectId('a prop name');
+      let prop;
+      if (name.includes(':')) [name, prop] = name.split(':');
+      else { if (!T.acceptSym(':')) throw T.err(`Use: prop ${name}: <prop-id> at 40`); prop = T.expectId('a prop id (e.g. mug, chair, tree)'); }
+      let at = { x: 50 };
+      const props = {};
+      const flags = { hidden: false, front: false, back: false, flip: false };
+      while (!T.done) {
+        if (T.acceptId('at')) at = parseTarget(T);
+        else if (T.isId() && Object.hasOwn(flags, T.peek().v) && !T.isSym('=', 1)) flags[T.next().v] = true;
+        else if (T.isId() && T.isSym('=', 1)) Object.assign(props, T.props());
+        else throw T.err(`Unexpected "${T.peek().v}" in prop line (try: at 40,10 scale=1.2 hidden front back flip up=100 color=#ff8800 text="…")`);
+      }
+      if (at.actor) throw T.err('Prop position must be a number like "at 30" or "at 30,10"');
+      return { kind: 'prop', name, prop, x: at.x, y: at.y ?? 0, ...flags, props };
+    }
+    case 'effect': {
+      // effect rain [amount=0.7] [fade=1s] | effect rain off | effect none
+      T.next();
+      const id = T.expectId('an effect name (e.g. rain, snow, fog) or "none"');
+      let off = id === 'none';
+      let amount;
+      const props = {};
+      while (!T.done && !T.isSym('&')) {
+        if (T.acceptId('off')) off = true;
+        else if (T.acceptId('on')) off = false;
+        else if (T.peek().t === 'num') amount = T.number();
+        else if (T.isId() && T.isSym('=', 1)) Object.assign(props, T.props());
+        else throw T.err(`Unexpected "${T.peek().v}" in effect line (use: effect ${id} amount=0.7 fade=1s, or effect ${id} off)`);
+      }
+      T.concurrent();
+      T.end();
+      return { kind: 'effect', id, off, amount, props };
     }
     case 'wait': { T.next(); const dur = T.duration(); T.end(); return { kind: 'wait', dur }; }
     case 'at': { T.next(); const t = T.duration(); T.end(); return { kind: 'at', t }; }
@@ -418,6 +480,7 @@ export function parse(source) {
         const node = parseStatement(T, stack);
         node.line = lineNo;
         if (node.kind === 'let') continue;
+        if (node.kind === 'prop' && top.node.kind !== 'scene') throw new FSError('"prop" must be inside a scene { } (like cast)', lineNo);
         if (node.kind === 'cast' || node.kind === 'transition' || node.kind === 'fade' || node.kind === 'voicedef' || node.kind === 'chardef') {
           if (node.kind === 'cast' && top.node.kind !== 'scene') throw new FSError('"cast" must be inside a scene { }', lineNo);
           if (node.kind !== 'cast' && stack.length > 1) throw new FSError(`"${node.kind}" must be between scenes, not inside one`, lineNo);

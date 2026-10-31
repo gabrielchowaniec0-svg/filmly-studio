@@ -4,6 +4,8 @@ import { estimateSpeechDuration } from '../engine/lipsync.js';
 import { MOODS, STAGE_W } from '../engine/timeline.js';
 import { resolveBuild } from '../engine/rig.js';
 import { TRANSITIONS } from '../assets/transitions/index.js';
+import { EFFECTS, EFFECT_ALIASES } from '../assets/effects/index.js';
+import { PROP_GRAB } from '../engine/timeline.js';
 import { PROVIDERS, parseVoiceSpec, needsAudio, DEFAULT_VOICE } from '../tts/catalog.js';
 
 function lev(a, b) {
@@ -34,7 +36,7 @@ export function compile(ast, assets, opts = {}) {
   const warnings = [];
   const err = (line, message, col = 0) => errors.push({ line, col, message, severity: 'error' });
   const warn = (line, message) => warnings.push({ line, col: 0, message, severity: 'warning' });
-  const uses = { characters: new Set(), scenes: new Set(), voices: new Set(), audio: new Set() };
+  const uses = { characters: new Set(), scenes: new Set(), voices: new Set(), audio: new Set(), props: new Set() };
 
   const meta = ast.film;
   if (!meta) return { film: null, errors, warnings };
@@ -154,11 +156,21 @@ export function compile(ast, assets, opts = {}) {
     const castOrder = [];
     const touched = new Set();
     const pos = {}; // known x/y per actor (stage px / depth) as authored
+    const holding = {}; // prop -> {actor, hand}
+    const hands = {}; // actor+hand -> prop
     const events = [];
     let now = 0, maxEnd = 0;
 
-    const need = (name, line) => {
-      if (!cast[name]) throw new FSError(`Unknown actor "${name}" in scene "${sc.id}".${suggest(name, castOrder)} Cast them first: cast ${name}: <character> at 50`, line);
+    const sceneProps = {}; // prop name -> placed prop (shares the actor namespace)
+    const propOrder = [];
+    const need = (name, line, allowProp = false) => {
+      if (!cast[name]) {
+        if (sceneProps[name]) {
+          if (allowProp) return null;
+          throw new FSError(`"${name}" is a prop, not an actor. Props can move, show and hide (${name} moves to 60), or be held (<actor> holds ${name}).`, line);
+        }
+        throw new FSError(`Unknown actor "${name}" in scene "${sc.id}".${suggest(name, [...castOrder, ...propOrder])} Cast them first: cast ${name}: <character> at 50`, line);
+      }
       return cast[name];
     };
     const rigOf = (name) => assets.rigs[charOf(cast[name].char).rig];
@@ -191,6 +203,7 @@ export function compile(ast, assets, opts = {}) {
     function exec(it) {
       switch (it.kind) {
         case 'cast': {
+          if (sceneProps[it.name]) throw new FSError(`"${it.name}" is already a prop in this scene — pick another name`, it.line);
           if (cast[it.name]) throw new FSError(`Actor "${it.name}" is already cast in this scene`, it.line);
           const char = charOf(it.char);
           if (!char) throw new FSError(`Unknown character "${it.char}".${suggest(it.char, allCharIds())} Available: ${list(allCharIds())}`, it.line);
@@ -230,19 +243,20 @@ export function compile(ast, assets, opts = {}) {
         case 'look': {
           need(it.actor, it.line);
           const ok = ['left', 'right', 'up', 'down', 'camera', 'center', 'auto'];
-          if (!ok.includes(it.target)) need(it.target, it.line);
+          if (!ok.includes(it.target)) need(it.target, it.line, true);
           push({ type: 'look', t: now, actor: it.actor, target: it.target });
           break;
         }
         case 'move': {
+          if (sceneProps[it.actor]) { propMove(it); break; }
           const a = need(it.actor, it.line);
           const from = pos[it.actor];
           let tx, ty = it.target.y ?? from.y;
           if (it.target.actor) {
-            const o = need(it.target.actor, it.line);
+            const o = need(it.target.actor, it.line, true);
             const ox = pos[it.target.actor].x;
             const dir = Math.sign(ox - from.x) || 1;
-            tx = ox - dir * 150 * (charOf(a.char).scale || 1);
+            tx = ox - dir * (o ? 150 : 70) * (charOf(a.char).scale || 1);
             ty = it.target.y ?? pos[it.target.actor].y;
           } else tx = (it.target.x / 100) * STAGE_W;
           let clipId = it.mode === 'runs' ? 'run' : it.mode === 'walks' ? 'walk' : null;
@@ -308,7 +322,7 @@ export function compile(ast, assets, opts = {}) {
           need(it.actor, it.line);
           let dir = it.dir;
           if (dir !== 'left' && dir !== 'right') {
-            need(dir, it.line);
+            need(dir, it.line, true);
             dir = pos[dir].x >= pos[it.actor].x ? 'right' : 'left';
           }
           push({ type: 'face', t: now, actor: it.actor, dir });
@@ -336,8 +350,8 @@ export function compile(ast, assets, opts = {}) {
           break;
         }
         case 'mood': need(it.actor, it.line); push({ type: 'mood', t: now, actor: it.actor, mood: checkMood(it.mood, it.line) }); break;
-        case 'show': need(it.actor, it.line); push({ type: 'show', t: now, actor: it.actor }); touched.add(it.actor); break;
-        case 'hide': need(it.actor, it.line); push({ type: 'hide', t: now, actor: it.actor }); touched.add(it.actor); break;
+        case 'show': if (sceneProps[it.actor]) { push({ type: 'propvis', t: now, prop: it.actor, v: true }); break; } need(it.actor, it.line); push({ type: 'show', t: now, actor: it.actor }); touched.add(it.actor); break;
+        case 'hide': if (sceneProps[it.actor]) { push({ type: 'propvis', t: now, prop: it.actor, v: false }); break; } need(it.actor, it.line); push({ type: 'hide', t: now, actor: it.actor }); touched.add(it.actor); break;
         case 'wait': now += it.dur; maxEnd = Math.max(maxEnd, now); break;
         case 'at': now = it.t; break;
         case 'hold': maxEnd = Math.max(maxEnd, now + it.dur); break;
@@ -372,13 +386,141 @@ export function compile(ast, assets, opts = {}) {
           break;
         }
         case 'repeat': for (let k = 0; k < it.count; k++) run(it.body); break;
+        case 'prop': case 'holdprop': case 'drop': case 'give': case 'effect': execPropEffect(it); break;
         default: throw new FSError(`Unhandled statement "${it.kind}"`, it.line);
+      }
+    }
+
+    // ---- props & effects -----------------------------------------------------------------
+    function needProp(name, line) {
+      if (sceneProps[name]) return sceneProps[name];
+      const hint = cast[name] ? ` "${name}" is an actor — only props can be held.` : suggest(name, propOrder);
+      throw new FSError(`Unknown prop "${name}" in scene "${sc.id}".${hint} Place it first: prop ${name}: <prop-id> at 50`, line);
+    }
+    function facingAt(actor) {
+      let f = cast[actor].facing, ft = -Infinity;
+      for (const e of events) if (e.type === 'face' && e.actor === actor && e.t <= now && e.t >= ft) { f = e.dir; ft = e.t; }
+      return f;
+    }
+    function releaseHand(name) {
+      const h = holding[name];
+      if (h) delete hands[h.actor + h.hand];
+      delete holding[name];
+    }
+    function propMove(it) {
+      const P = sceneProps[it.actor];
+      if (it.mode !== 'moves') throw new FSError(`Props can't ${it.mode.replace(/s$/, '')} — use: ${it.actor} moves to 60 over 1s`, it.line);
+      if (holding[it.actor]) throw new FSError(`${it.actor} is in ${holding[it.actor].actor}'s hand — "${holding[it.actor].actor} drops ${it.actor}" first`, it.line);
+      const from = pos[it.actor];
+      let tx, ty = it.target.y ?? from.y;
+      if (it.target.actor) {
+        need(it.target.actor, it.line, true);
+        tx = pos[it.target.actor].x;
+        ty = it.target.y ?? pos[it.target.actor].y;
+      } else tx = (it.target.x / 100) * STAGE_W;
+      const up = it.props.up != null ? +it.props.up : undefined;
+      const fromUp = from.up ?? P.up;
+      const dist = Math.hypot(tx - from.x, (ty - from.y) * 4, (up ?? fromUp) - fromUp);
+      const dur = Math.max(0.05, it.dur ?? Math.max(0.3, dist / 500));
+      push({ type: 'propmove', t: now, prop: it.actor, to: { x: tx, y: ty, up }, dur, ease: it.props.ease || 'inout' }, now + dur);
+      pos[it.actor] = { x: tx, y: ty, up: up ?? fromUp };
+      advance(it, dur);
+    }
+    function execPropEffect(it) {
+      const lib = assets.props || {};
+      switch (it.kind) {
+        case 'prop': {
+          if (cast[it.name] || sceneProps[it.name]) throw new FSError(`"${it.name}" is already used in this scene — pick another name`, it.line);
+          const def = lib[it.prop];
+          if (!def) {
+            const ids = Object.keys(lib);
+            throw new FSError(`Unknown prop "${it.prop}".${suggest(it.prop, ids)} Available: ${ids.length ? list(ids) : '(no props loaded)'}`, it.line);
+          }
+          const P = { prop: it.prop, x: (it.x / 100) * STAGE_W, y: it.y, up: 0, hidden: it.hidden, front: it.front, back: it.back, flip: it.flip };
+          for (const [k, v] of Object.entries(it.props)) {
+            if (k === 'scale') P.scale = +v;
+            else if (k === 'up') P.up = +v;
+            else if (k === 'text') {
+              if (!def.text) throw new FSError(`"${it.prop}" has no space for text (try sign, board, letter, poster)`, it.line);
+              P.text = String(v);
+            } else if (k === 'color') {
+              if (!/^#[0-9a-fA-F]{3,8}$/.test(String(v))) throw new FSError(`Colors look like #ff8800 (got "${v}")`, it.line);
+              if (!def.palette?.main) throw new FSError(`"${it.prop}" can't be recolored`, it.line);
+              P.palette = { main: String(v) };
+            } else throw new FSError(`Unknown prop setting "${k}".${suggest(k, ['scale', 'up', 'color', 'text'])} Try: scale=1.2 up=100 color=#ff8800 text="…" (and flags hidden front back flip)`, it.line);
+          }
+          sceneProps[it.name] = P;
+          propOrder.push(it.name);
+          pos[it.name] = { x: P.x, y: P.y, up: P.up };
+          uses.props.add(it.prop);
+          break;
+        }
+        case 'holdprop': case 'give': {
+          const giver = it.kind === 'give' ? it.actor : null;
+          const who = it.kind === 'give' ? it.to : it.actor;
+          need(who, it.line);
+          const P = needProp(it.prop, it.line);
+          const def = lib[P.prop];
+          if (!def.grip) throw new FSError(`"${it.prop}" (${P.prop}) is too big to hold — holdable props have a grip (e.g. mug, phone, book, umbrella, flashlight)`, it.line);
+          if (giver) {
+            need(giver, it.line);
+            if (holding[it.prop]?.actor !== giver) throw new FSError(`${giver} isn't holding ${it.prop} — first: ${giver} holds ${it.prop}`, it.line);
+          }
+          const hand = it.hand === 'near' ? 'N' : 'F';
+          const busy = hands[who + hand];
+          if (busy && busy !== it.prop) throw new FSError(`${who} already has ${busy} in the ${hand === 'F' ? 'far' : 'near'} hand — try "${who} holds ${it.prop} in ${hand === 'F' ? 'near' : 'far'}" or "${who} drops ${busy}" first`, it.line);
+          releaseHand(it.prop);
+          push({ type: 'hold', t: now, prop: it.prop, actor: who, hand });
+          holding[it.prop] = { actor: who, hand };
+          hands[who + hand] = it.prop;
+          touched.add(who);
+          advance(it, PROP_GRAB);
+          break;
+        }
+        case 'drop': {
+          const a = need(it.actor, it.line);
+          if (it.prop) {
+            needProp(it.prop, it.line);
+            if (holding[it.prop]?.actor !== it.actor) throw new FSError(`${it.actor} isn't holding ${it.prop}`, it.line);
+          }
+          const names = it.prop ? [it.prop] : Object.keys(holding).filter((n) => holding[n].actor === it.actor);
+          const fs = facingAt(it.actor) === 'left' ? -1 : 1;
+          const s = (charOf(a.char).scale || 1) * (a.scale || 1);
+          for (const n of names) {
+            const hand = holding[n].hand;
+            const p = pos[it.actor];
+            const to = { x: p.x + fs * (hand === 'F' ? 46 : -26) * s, y: Math.min(100, p.y + (hand === 'F' ? 0 : 2)) };
+            push({ type: 'drop', t: now, prop: n, actor: it.actor, hand, to });
+            pos[n] = { x: to.x, y: to.y, up: 0 };
+            releaseHand(n);
+          }
+          touched.add(it.actor);
+          if (names.length) advance(it, 0.3);
+          break;
+        }
+        case 'effect': {
+          const fade = it.props.fade != null ? +it.props.fade : undefined;
+          if (it.id === 'none') { push({ type: 'effect', t: now, id: '*', amount: 0, fade }); break; }
+          const id = EFFECTS[it.id] ? it.id : EFFECT_ALIASES[it.id];
+          if (!id) throw new FSError(`Unknown effect "${it.id}".${suggest(it.id, [...Object.keys(EFFECTS), ...Object.keys(EFFECT_ALIASES)])} Available: ${Object.keys(EFFECTS).join(', ')}`, it.line);
+          const opts = {};
+          let amount = it.amount ?? 1;
+          for (const [k, v] of Object.entries(it.props)) {
+            if (k === 'fade') continue;
+            if (k === 'amount') amount = +v;
+            else if (k === 'follow') { need(String(v), it.line); opts.follow = String(v); }
+            else opts[k] = v;
+          }
+          if (!(amount >= 0)) throw new FSError('amount must be a number from 0 to 1', it.line);
+          push({ type: 'effect', t: now, id, amount: it.off ? 0 : Math.min(1, amount), fade, opts });
+          break;
+        }
       }
     }
 
     const duration = Math.max(0.5, Math.max(maxEnd, now) + (sc.props.tail ?? 0.5));
     return {
-      id: sc.id, bg: bgId, start: 0, duration, cast, castOrder, events,
+      id: sc.id, bg: bgId, start: 0, duration, cast, castOrder, events, props: sceneProps, propOrder,
       transitionIn: transition ? { type: transition.name, dur: transition.dur } : null,
     };
   }

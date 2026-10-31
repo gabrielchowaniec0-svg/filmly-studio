@@ -89,6 +89,33 @@ requests, tick "Route through site proxy" (uses the Netlify function in `netlify
 `color.<skin|hair|brow|eye|blush|top|top2|bottom|shoes|sole|accent|frame>=#rrggbb`.
 The editor's **Character Creator** writes this line for you.
 
+## Props
+Objects placed in a scene (`src/assets/props/*.json`, ~70 of them: furniture, kitchen, everyday,
+outdoor, spooky, fun). Props share names with actors, so `mira walks to cup` / `looks at cup` / `faces cup` work.
+```
+prop cup: mug at 40,10              # name: prop-id at X%[,depth]
+prop s: sign at 20 text="Lemonade"  # options: scale=1.2 up=300 (lift off the floor, e.g. wall items)
+                                    #   color=#3366ff (recolorable props)  text="…" (sign, chalkboard, tv, newspaper)
+                                    #   flags: hidden  front (over actors)  back (behind actors)  flip
+cup moves to 60,5 over 1s           # also: moves to <actor|prop>, up=120, ease=…
+cup shows / cup hides
+mira holds cup                      # far hand (default) — "in near" for the other hand; hand closes into a fist
+mira gives cup to bo [in near]      # hand-off (glides between hands)
+mira drops cup                      # falls to the floor where the hand was; "mira drops" drops everything
+```
+Only props with a grip can be held (mug, phone, book, umbrella, flashlight, key, letter, map, magnifier, guitar, …).
+
+## Effects
+Screen effects drawn over the scene (`src/assets/effects/index.js`), frame-exact in exports.
+```
+effect rain amount=0.7              # fades in over 0.5s (fade=2s to change); amount 0-1
+effect rain off                     # fades out; "effect none" stops them all
+effect spotlight follow=mira size=18   # spotlight also takes x= y= (in %); sunset_glow takes x= y=
+```
+`rain heavy_rain snow fog dust sparkles fireflies leaves lightning underwater spotlight sunset_glow
+night_tint sepia old_film vignette film_grain` (aliases: motes caustics night sunset grain storm sparkle).
+Weather draws first, then light, then colour grades, then grain.
+
 ## Errors
 The editor underlines the problem line with a suggestion ("Did you mean …?"). Unknown actors,
 characters, backgrounds, voices, clips and moods all list the valid choices.
