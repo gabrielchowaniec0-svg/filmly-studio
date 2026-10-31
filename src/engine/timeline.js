@@ -17,7 +17,7 @@ export const MOODS = {
   sleepy: { eyes: 'open', brows: 'neutral', mouth: 'rest', lid: 0.55 },
 };
 
-export const TALK_CLIPS = ['talk_a', 'talk_b', 'talk_c'];
+export const TALK_CLIPS = ['talk_a', 'talk_b', 'talk_c', 'talk_d', 'talk_e', 'talk_excited', 'talk_calm']; // = rig.talkClips (humanoid)
 const BLEND = 0.24; // seconds to cross-fade between base animations
 const TURN = 0.2; // seconds for a facing turn
 
