@@ -16,6 +16,7 @@ export function buildManifest() {
     scenes: list('src/assets/scenes', '.json'),
     props: list('src/assets/props', '.json'),
     voices: 'src/assets/voices/voices.json',
+    sounds: existsSync(join(root, 'src/assets/sounds/sounds.json')) ? 'src/assets/sounds/sounds.json' : null,
     films: list('films', '.fly'),
   };
 }

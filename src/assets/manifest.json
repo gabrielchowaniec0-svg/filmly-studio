@@ -114,6 +114,7 @@
     "src/assets/props/umbrella_closed.json"
   ],
   "voices": "src/assets/voices/voices.json",
+  "sounds": "src/assets/sounds/sounds.json",
   "films": [
     "films/hello-filmly.fly"
   ]

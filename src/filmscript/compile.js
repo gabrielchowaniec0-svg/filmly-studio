@@ -36,7 +36,7 @@ export function compile(ast, assets, opts = {}) {
   const warnings = [];
   const err = (line, message, col = 0) => errors.push({ line, col, message, severity: 'error' });
   const warn = (line, message) => warnings.push({ line, col: 0, message, severity: 'warning' });
-  const uses = { characters: new Set(), scenes: new Set(), voices: new Set(), audio: new Set(), props: new Set() };
+  const uses = { characters: new Set(), scenes: new Set(), voices: new Set(), audio: new Set(), props: new Set(), sounds: new Set() };
 
   const meta = ast.film;
   if (!meta) return { film: null, errors, warnings };
@@ -370,9 +370,8 @@ export function compile(ast, assets, opts = {}) {
           advance(it, it.dur);
           break;
         }
-        case 'music': case 'sfx':
-          uses.audio.add(it.src);
-          push({ type: it.kind, t: now, src: it.src, vol: it.props.vol ?? (it.kind === 'music' ? 0.5 : 1), fade: it.props.fade ?? 0 });
+        case 'music': case 'sfx': case 'ambience':
+          push(soundEvent(it, now));
           break;
         case 'par': {
           const t0 = now;
@@ -524,6 +523,57 @@ export function compile(ast, assets, opts = {}) {
       id: sc.id, bg: bgId, start: 0, duration, cast, castOrder, events, props: sceneProps, propOrder, line: sc.line,
       transitionIn: transition ? { type: transition.name, dur: transition.dur, line: transition.line } : null,
     };
+  }
+
+  // ---- sound library (sfx / music / ambience) -----------------------------------------------
+  // Event shapes (scene-relative t; src = file path the mixer loads):
+  //   {type:'sfx', t, src, sound, vol, rate, pan}
+  //   {type:'music', t, src, sound, vol, fade} | {type:'music', t, stop:true, fade}
+  //   {type:'ambience', t, src, sound, vol, fade, pan} | {type:'ambience', t, stop:true, src|null, fade}
+  // fade: null = mixer default. Music carries across scenes until stopped/replaced; ambience ends with its scene.
+  function soundEvent(it, t) {
+    const SOUND_PROPS = { sfx: ['vol', 'rate', 'pan'], music: ['vol', 'fade'], ambience: ['vol', 'fade', 'pan'] };
+    const allowed = it.stop ? ['fade'] : SOUND_PROPS[it.kind];
+    for (const k of Object.keys(it.props)) {
+      if (allowed.includes(k)) continue;
+      const pre = allowed.find((a) => k.startsWith(a));
+      throw new FSError(`"${k}" isn't an option here.${pre ? ` Did you mean "${pre}"?` : suggest(k, allowed)} Options: ${allowed.join(', ')}`, it.line);
+    }
+    const num = (k, lo, hi, hint) => {
+      const v = it.props[k];
+      if (v == null) return null;
+      if (typeof v !== 'number' || !(v >= lo && v <= hi)) throw new FSError(`${k} must be a number from ${lo} to ${hi}${hint ? ` (${hint})` : ''}`, it.line);
+      return v;
+    };
+    const vol = num('vol', 0, 4, '1 = normal, 0.5 = half');
+    const fade = num('fade', 0, 60, 'seconds, e.g. fade=2s');
+    if (it.stop) {
+      let src = null;
+      if (it.sound || it.src) src = it.src || resolveSound(it.sound, it.kind, it.line).file;
+      return { type: it.kind, t, stop: true, src, fade };
+    }
+    let src = it.src, sound = null;
+    if (it.sound) {
+      const s = resolveSound(it.sound, it.kind, it.line);
+      src = s.file;
+      sound = s.id;
+      uses.sounds.add(s.id);
+    }
+    uses.audio.add(src);
+    if (it.kind === 'sfx') return { type: 'sfx', t, src, sound, vol: vol ?? 1, rate: num('rate', 0.25, 4, '1 = normal pitch'), pan: num('pan', -1, 1, '-1 left … 1 right') };
+    if (it.kind === 'music') return { type: 'music', t, src, sound, vol: vol ?? 0.5, fade };
+    return { type: 'ambience', t, src, sound, vol: vol ?? 0.8, fade, pan: num('pan', -1, 1, '-1 left … 1 right') };
+  }
+
+  function resolveSound(id, kind, line) {
+    const lib = assets.sounds || {};
+    if (lib[id]) return lib[id];
+    const all = Object.values(lib);
+    const same = all.filter((s) => s.kind === kind).map((s) => s.id);
+    const label = { sfx: 'Sound effects', music: 'Music', ambience: 'Ambiences' }[kind];
+    if (!all.length) throw new FSError(`Unknown sound "${id}" (the sound library isn't loaded). Use a file instead: ${kind} "audio/my-sound.mp3"`, line);
+    const hint = suggest(id, same) || suggest(id, all.map((s) => s.id));
+    throw new FSError(`Unknown ${kind === 'sfx' ? 'sound effect' : kind} "${id}".${hint} ${label}: ${same.join(', ')}. Or use your own file: ${kind} "audio/file.mp3"`, line);
   }
 
   function checkMood(m, line) {
