@@ -2,6 +2,7 @@
 import { FSError } from './parse.js';
 import { estimateSpeechDuration } from '../engine/lipsync.js';
 import { MOODS, STAGE_W } from '../engine/timeline.js';
+import { resolveBuild } from '../engine/rig.js';
 import { TRANSITIONS } from '../assets/transitions/index.js';
 import { PROVIDERS, parseVoiceSpec, needsAudio, DEFAULT_VOICE } from '../tts/catalog.js';
 
@@ -161,6 +162,19 @@ export function compile(ast, assets, opts = {}) {
       return cast[name];
     };
     const rigOf = (name) => assets.rigs[charOf(cast[name].char).rig];
+    // Natural pace (stage px/s) of a movement clip for this actor: clip.speed is for a regular build at scale 1,
+    // so scale it by leg length (build), character/cast scale and depth to keep the feet planted.
+    const paceOf = (name, clip, y = 0) => {
+      const rig = rigOf(name), ch = charOf(cast[name].char);
+      let legs = 1;
+      const bone = (id) => rig.bones?.find((b) => b.id === id);
+      if (bone('shinN') && bone('footN')) {
+        const bd = resolveBuild(rig, ch);
+        const len = (id) => bone(id).pos[1] + (bd[id]?.dpos?.[1] || 0);
+        legs = (len('shinN') + len('footN')) / (bone('shinN').pos[1] + bone('footN').pos[1]);
+      }
+      return (clip?.speed || 190) * legs * (ch.scale || 1) * (cast[name].scale || 1) * (1 + (y || 0) * 0.002);
+    };
     const push = (e, end) => { events.push(e); maxEnd = Math.max(maxEnd, end ?? e.t); };
     const advance = (it, dur) => { if (!it.concurrent) now += dur; maxEnd = Math.max(maxEnd, now); };
 
@@ -231,10 +245,19 @@ export function compile(ast, assets, opts = {}) {
             tx = ox - dir * 150 * (charOf(a.char).scale || 1);
             ty = it.target.y ?? pos[it.target.actor].y;
           } else tx = (it.target.x / 100) * STAGE_W;
-          const clipId = it.mode === 'runs' ? 'run' : it.mode === 'walks' ? 'walk' : null;
+          let clipId = it.mode === 'runs' ? 'run' : it.mode === 'walks' ? 'walk' : null;
+          if (it.props.style != null) {
+            // style=<any base movement clip>: sneak, stroll, march, tiptoe, jog, sprint, ...
+            const clips = rigOf(it.actor).clips;
+            const style = String(it.props.style);
+            const styles = Object.keys(clips).filter((k) => clips[k].speed && !clips[k].overlay);
+            if (!clips[style]) throw new FSError(`Unknown walk style "${style}".${suggest(style, styles)} Styles: ${list(styles)}`, it.line);
+            if (!clips[style].speed || clips[style].overlay) throw new FSError(`"${style}" isn't a movement style.${suggest(style, styles)} Styles: ${list(styles)}`, it.line);
+            clipId = style;
+          }
           const clip = clipId ? rigOf(it.actor).clips[clipId] : null;
           const dist = Math.abs(tx - from.x);
-          const speed = (clip && clip.speed) || 220;
+          const speed = clip ? paceOf(it.actor, clip, from.y) : 220;
           let dur = it.dur ?? Math.max(0.25, dist / speed);
           if (dur <= 0) dur = 0.25;
           const rate = clip ? Math.max(0.4, Math.min(2.6, dist / dur / speed)) : 1;
@@ -251,10 +274,11 @@ export function compile(ast, assets, opts = {}) {
           const target = { ...pos[it.actor] };
           const edge = it.from === 'right' ? STAGE_W + 160 : -160;
           if (it.from !== 'left' && it.from !== 'right') throw new FSError('enters from left or right', it.line);
-          const dur = it.dur ?? Math.max(0.6, Math.abs(target.x - edge) / (rigOf(it.actor).clips.walk?.speed || 190));
-          const dist = Math.abs(target.x - edge);
           const clip = rigOf(it.actor).clips.walk;
-          const rate = clip ? Math.max(0.4, Math.min(2.6, dist / dur / (clip.speed || 190))) : 1;
+          const pace = paceOf(it.actor, clip, target.y);
+          const dur = it.dur ?? Math.max(0.6, Math.abs(target.x - edge) / pace);
+          const dist = Math.abs(target.x - edge);
+          const rate = clip ? Math.max(0.4, Math.min(2.6, dist / dur / pace)) : 1;
           push({ type: 'show', t: now, actor: it.actor, x: edge, y: target.y });
           push({ type: 'face', t: now, actor: it.actor, dir: it.from === 'left' ? 'right' : 'left' });
           push({ type: 'move', t: now, actor: it.actor, to: target, dur, clip: 'walk', rate, ease: 'linear' }, now + dur);
@@ -269,8 +293,9 @@ export function compile(ast, assets, opts = {}) {
           const edge = it.to === 'right' ? STAGE_W + 160 : -160;
           const clip = rigOf(it.actor).clips.walk;
           const dist = Math.abs(edge - from.x);
-          const dur = it.dur ?? Math.max(0.6, dist / (clip?.speed || 190));
-          const rate = clip ? Math.max(0.4, Math.min(2.6, dist / dur / (clip.speed || 190))) : 1;
+          const pace = paceOf(it.actor, clip, from.y);
+          const dur = it.dur ?? Math.max(0.6, dist / pace);
+          const rate = clip ? Math.max(0.4, Math.min(2.6, dist / dur / pace)) : 1;
           push({ type: 'face', t: now, actor: it.actor, dir: it.to });
           push({ type: 'move', t: now, actor: it.actor, to: { x: edge, y: from.y }, dur, clip: 'walk', rate, ease: 'linear' }, now + dur);
           push({ type: 'hide', t: now + dur, actor: it.actor });

@@ -119,6 +119,8 @@ class Toks {
 const ALIAS = {
   waves: 'wave', jumps: 'jump', shrugs: 'shrug', nods: 'nod', cheers: 'cheer', gestures: 'talk', points: 'point', thinks: 'think',
   claps: 'clap', laughs: 'laugh', bows: 'bow', dances: 'dance', facepalms: 'facepalm', gasps: 'surprised', sulks: 'sad_slump',
+  salutes: 'salute', yawns: 'yawn', cries: 'cry', sobs: 'cry', beckons: 'beckon', stretches: 'stretch', stomps: 'stomp',
+  cowers: 'cower', celebrates: 'celebrate', shushes: 'shush', peeks: 'peek', pleads: 'plead', begs: 'plead', prays: 'pray',
 };
 const ACTOR_VERBS = ['walks', 'runs', 'moves', 'enters', 'exits', 'faces', 'looks', 'plays', 'feels', 'idles', 'shows', 'hides', 'says', ...Object.keys(ALIAS)];
 

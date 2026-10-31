@@ -20,14 +20,19 @@ scene street bg=street_day {       # bg= any background id. tail=1s adds padding
                                    #   options: voice=openai:coral | voice=narrator  for=2s  mood=happy  still  gesture=talk_b
                                    #            energy=0.5 (smaller talk gestures)  audio="x.mp3"  gap=0.2
   mira walks to 50 over 2s         # walks | runs | moves (glide). target: number, "60,10", or another actor name
+  mira walks to 70 style=sneak     #   style= sneak stroll march tiptoe strut sad_walk limp jog sprint (sets the pace)
   bo enters from right over 2s &   # & = don't wait; the next line starts at the same time
   mira waves                       # shortcuts: waves jumps shrugs nods cheers points thinks claps laughs bows
-                                   #            dances facepalms gasps sulks
+                                   #   dances facepalms gasps sulks salutes yawns cries beckons stretches stomps
+                                   #   cowers celebrates shushes peeks pleads prays
   mira plays cross_arms for 4s     # plays <clip> [for 2s] [speed=1.5]; "hold" clips (point, think, cross_arms,
-                                   #   facepalm, bow, shrug, sad_slump, surprised) hold their pose for the duration
+                                   #   facepalm, bow, shrug, sad_slump, surprised, thumbs_up, hands_on_hips, salute,
+                                   #   plead, pray, shush, peek, phone_call, scratch_head, cower, cry, beckon, yawn,
+                                   #   stretch) hold their pose for the duration; also shake_fist double_take
   mira looks at bo                 # looks at <actor> | left | right | up | down | camera | around | away
                                    #   (by default everyone watches whoever is talking)
-  mira plays idle                  # base clips (idle, walk, run) stay until changed
+  mira plays idle                  # base clips stay until changed: idle idle_bored idle_nervous idle_confident
+                                   #   idle_tired (and any walk style)
   mira feels happy                 # neutral happy joy sad angry surprised worried sleepy
   mira faces left                  # left | right | an actor name
   bo exits to right
