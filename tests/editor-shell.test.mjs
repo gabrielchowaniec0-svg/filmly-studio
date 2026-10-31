@@ -104,13 +104,13 @@ test('every template compiles', () => {
 });
 
 test('switchToKokoro rewrites browser voices (named, inline, inherited) and compiles', () => {
-  const src = 'film "K" 1920x1080\nvoice host = browser_bright\ncharacter rosa from priya voice=browser_kid\nscene a bg=studio {\n  cast m: mira at 30\n  cast r: rosa at 60\n  cast k: kai at 80\n  m: "one" voice=host\n  r: "two"\n  k: "three" voice=webspeech:auto &\n  m: "four"\n  k: "five" voice=kokoro:am_echo\n}\n';
+  const src = 'film "K" 1920x1080\nvoice host = browser_bright\ncharacter rosie from priya voice=browser_kid\nscene a bg=studio {\n  cast m: mira at 30\n  cast r: rosie at 60\n  cast k: kai at 80\n  m: "one" voice=host\n  r: "two"\n  k: "three" voice=webspeech:auto &\n  m: "four"\n  k: "five" voice=kokoro:am_echo\n}\n';
   const r0 = ok(src);
   const { src: out, changes } = switchToKokoro(src, A, r0.lines);
   const r1 = ok(out);
   assert.ok(changes.length >= 4);
   assert.match(out, /voice host = kokoro:af_bella speed=1.05/);
-  assert.match(out, /character rosa from priya voice=kokoro:af_sky/);
+  assert.match(out, /character rosie from priya voice=kokoro:af_sky/);
   assert.match(out, /k: "three" voice=kokoro:af_heart &/);
   assert.match(out, /m: "four" voice=kokoro:/);
   assert.match(out, /k: "five" voice=kokoro:am_echo/);

@@ -59,7 +59,8 @@ test('existing characters keep their look: default shoes and every option they u
     assert.equal(opts.shoes, c.options.shoes ?? 'sneakers');
     const shown = rig.parts.filter((p) => partVisible(p, opts));
     assert.ok(shown.length > 40, `${c.id}: only ${shown.length} parts visible`);
-    assert.ok(shown.some((p) => p.id === 'footNShoe'), `${c.id}: sneakers missing`);
+    if ((c.options.shoes ?? 'sneakers') === 'sneakers') assert.ok(shown.some((p) => p.id === 'footNShoe'), `${c.id}: sneakers missing`);
+    else assert.ok(shown.some((p) => p.bone === 'footN'), `${c.id}: shoes missing`);
   }
 });
 
