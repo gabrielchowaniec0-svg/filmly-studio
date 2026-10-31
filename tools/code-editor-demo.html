@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FilmScript code editor — demo</title>
+<link rel="stylesheet" href="../src/style.css">
+<style>
+  body { display: flex; flex-direction: column; height: 100vh; }
+  .demoBar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .demoBar b { color: var(--acc); margin-right: 8px; }
+  #host { flex: 1; min-height: 0; }
+  #status { padding: 4px 12px; font-size: 12px; color: var(--dim); border-top: 1px solid var(--line); background: var(--panel); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  :root[data-theme=light] body { background: #fbfaf7; color: #23252d; }
+</style>
+</head>
+<body>
+<div class="demoBar">
+  <b>FilmScript editor</b>
+  <button id="bTheme">Light / dark</button>
+  <button id="bBig">3,000-line file</button>
+  <button id="bCast">insert cast (line-end)</button>
+  <button id="bChar">insert character (top)</button>
+  <button id="bUndo">Undo</button><button id="bRedo">Redo</button>
+  <button id="bFind">Find</button>
+  <button id="bRO">Read-only</button>
+</div>
+<div id="host"></div>
+<div id="status" class="mono">loading…</div>
+<script type="module">
+import { createCodeEditor } from '../src/editor/code/code-editor.js';
+import { loadAssets } from '../src/assets/loader.js';
+import { compileSource } from '../src/filmscript/index.js';
+
+const $ = (id) => document.getElementById(id);
+let assets = null;
+const src = await (await fetch('../films/hello-filmly.fly')).text();
+const ed = createCodeEditor($('host'), {
+  value: src,
+  getAssets: () => assets,
+  getVocabulary: () => ({ effects: ['rain', 'snow', 'fog'], sounds: [{ id: 'door_knock', kind: 'sfx' }, { id: 'happy_loop', kind: 'music' }, { id: 'birds', kind: 'ambience' }] }),
+  onChange: (v, { source }) => { schedule(); status(`change (${source}) · ${v.length} chars`); },
+  onCursor: (line, col) => status(`Ln ${line}, Col ${col + 1}`),
+});
+window.ed = ed;
+function status(s) { $('status').textContent = `${s} · ${ed.getLineCount()} lines`; }
+let t = 0, lastMs = 0;
+function schedule() { clearTimeout(t); t = setTimeout(check, 250); }
+function check() {
+  if (!assets) return;
+  const t0 = performance.now();
+  const r = compileSource(ed.getValue(), assets);
+  lastMs = performance.now() - t0;
+  ed.setDiagnostics([...r.errors, ...(r.warnings || [])].map((d) => ({ ...d, severity: d.severity || 'error' })));
+  window.__diag = r.errors.length;
+}
+loadAssets('../').then((a) => { assets = a; check(); window.__ready = true; status('ready'); });
+
+$('bTheme').onclick = () => { const r = document.documentElement; r.dataset.theme = r.dataset.theme === 'light' ? 'dark' : 'light'; };
+$('bBig').onclick = () => {
+  const out = ['film "Big" 1920x1080 @30', ''];
+  for (let s = 0; out.length < 3000; s++) {
+    out.push(`scene s${s} bg=street_day {`, '  cast mira: mira at 25', '  cast bo: bo at 75 facing=left');
+    for (let k = 0; k < 40; k++) out.push(k % 3 ? `  mira: "Line ${k} of scene ${s} — keep going!" mood=happy` : `  bo walks to ${20 + k} over 1.5s &  # step ${k}`);
+    out.push('}', `transition fade 0.5s`, '');
+  }
+  ed.setValue(out.slice(0, 3000).join('\n'));
+};
+$('bCast').onclick = () => ed.insert('cast nora: nora at 60', 'line-end');
+$('bChar').onclick = () => ed.insert('character pia from priya hair=bob build=round', 'top');
+$('bUndo').onclick = () => ed.undo();
+$('bRedo').onclick = () => ed.redo();
+$('bFind').onclick = () => ed.openFind(true);
+let ro = false;
+$('bRO').onclick = () => { ro = !ro; ed.setReadOnly(ro); $('bRO').classList.toggle('on', ro); };
+</script>
+</body>
+</html>
