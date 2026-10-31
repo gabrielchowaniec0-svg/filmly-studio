@@ -63,6 +63,15 @@ test('existing characters keep their look: default shoes and every option they u
   }
 });
 
+test('every build stands with its feet exactly on the floor (rest pose)', async () => {
+  const { boneMatrices } = await import('../src/engine/rig.js');
+  const ref = boneMatrices(rig, {}, undefined, {});
+  for (const [name, build] of Object.entries(rig.builds)) {
+    const m = boneMatrices(rig, {}, undefined, build);
+    for (const f of ['footN', 'footF']) assert.ok(Math.abs(m[f][5] - ref[f][5]) < 1e-6, `${name}: ${f} at y=${m[f][5]} (regular ${ref[f][5]})`);
+  }
+});
+
 test('part count stays reasonable', () => {
   assert.ok(rig.parts.length < 800, `${rig.parts.length} parts`);
   // what is actually drawn for one character is much smaller

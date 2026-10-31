@@ -35,7 +35,7 @@ export const builds = {
   round: { torso: { scale: [1.28, 1] }, hips: { scale: [1.22, 1] }, ...limbs(1.12), ...legs(1.16), armN: { scale: [1.12, 1], dpos: [-9, 2] }, armF: { scale: [1.12, 1], dpos: [8, 2] }, thighN: { scale: [1.16, 1], dpos: [-4, 0] }, thighF: { scale: [1.16, 1], dpos: [3, 0] }, neck: { scale: [1.15, 1] } },
   tall: { ...legs(0.95, 1.1), shinN: { scale: [0.95, 1.1], dpos: [0, 8] }, shinF: { scale: [0.95, 1.1], dpos: [0, 8] }, footN: { dpos: [0, 8] }, footF: { dpos: [0, 8] }, hips: { dpos: [0, -16], scale: [1, 1.08] }, torso: { scale: [0.96, 1.05], dpos: [0, 0] }, neck: { dpos: [0, -5] } },
   kid: {
-    hips: { dpos: [0, 38], scale: [0.86, 0.8] }, ...legs(0.86, 0.78), // hips y-scale ≈ leg scale so skirts/coats keep their length
+    hips: { dpos: [0, 34], scale: [0.86, 0.8] }, ...legs(0.86, 0.78), // hips y-scale ≈ leg scale so skirts/coats keep their length
     shinN: { scale: [0.86, 0.78], dpos: [0, -17] }, shinF: { scale: [0.86, 0.78], dpos: [0, -17] },
     footN: { dpos: [0, -17] }, footF: { dpos: [0, -17] },
     torso: { scale: [0.86, 0.84] }, neck: { dpos: [0, 18] },
