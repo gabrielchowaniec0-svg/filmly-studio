@@ -3,6 +3,7 @@ import { drawRig, poseAt } from '../engine/rig.js';
 import { trs } from '../engine/paint.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const DRESS_TOPS = ['dress', 'sundress', 'gown'];
 const SKIP_SLOTS = new Set(['eyes', 'brows', 'mouth', 'handF', 'handN']);
 const SKIN = ['#f6d3b8', '#f1c3a0', '#e0a982', '#c68a5e', '#a86b45', '#8d5a3b', '#6b4029', '#4f2e1d'];
 const HAIR = ['#141012', '#3a2a1e', '#4a2a18', '#8a5a2b', '#b5431f', '#e2b84f', '#cfcfcf', '#7b5cd6', '#2f7d5b'];
@@ -94,7 +95,7 @@ export function openCreator(host) {
     else if (act === 'random') {
       const pick = (a) => a[Math.floor(Math.random() * a.length)];
       for (const [k, s] of Object.entries(rig.slots)) if (!SKIP_SLOTS.has(k)) c.options[k] = pick(s.options);
-      if (c.options.top === 'dress') c.options.bottom = 'bare'; else if (c.options.bottom === 'bare') c.options.bottom = 'pants';
+      if (DRESS_TOPS.includes(c.options.top)) c.options.bottom = 'bare'; else if (c.options.bottom === 'bare') c.options.bottom = 'pants';
       if (Math.random() < 0.6) c.options.eyewear = 'none';
       if (Math.random() < 0.6) c.options.headwear = 'none';
       if (Math.random() < 0.7) c.options.facial = 'none';
@@ -120,7 +121,7 @@ export function openCreator(host) {
   };
   dlg.onchange = (e) => {
     const t = e.target;
-    if (t.dataset.slot) { c.options[t.dataset.slot] = t.value; if (t.dataset.slot === 'top' && t.value === 'dress') c.options.bottom = 'bare'; render(); }
+    if (t.dataset.slot) { c.options[t.dataset.slot] = t.value; if (t.dataset.slot === 'top' && DRESS_TOPS.includes(t.value)) c.options.bottom = 'bare'; else if (t.dataset.slot === 'top' && c.options.bottom === 'bare') c.options.bottom = 'pants'; render(); }
     else if (t.dataset.color) { c.palette[t.dataset.color] = t.value; refreshLine(); }
     else if (t.dataset.act === 'base') { base = t.value; c = JSON.parse(JSON.stringify(assets.characters[base])); id = 'my_' + base; render(); }
     else if (t.dataset.act === 'id') { id = t.value.replace(/[^A-Za-z0-9_]/g, '_') || 'my_character'; refreshLine(); }

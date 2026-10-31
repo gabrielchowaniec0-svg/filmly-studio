@@ -3,18 +3,30 @@
     "src/assets/rigs/humanoid.json"
   ],
   "characters": [
+    "src/assets/characters/amara.json",
     "src/assets/characters/bo.json",
     "src/assets/characters/dex.json",
+    "src/assets/characters/diego.json",
+    "src/assets/characters/fatima.json",
     "src/assets/characters/grace.json",
+    "src/assets/characters/hiro.json",
+    "src/assets/characters/jade.json",
     "src/assets/characters/juno.json",
     "src/assets/characters/kai.json",
     "src/assets/characters/leo.json",
+    "src/assets/characters/luna.json",
+    "src/assets/characters/malik.json",
     "src/assets/characters/marcus.json",
     "src/assets/characters/mira.json",
     "src/assets/characters/nora.json",
     "src/assets/characters/otto.json",
     "src/assets/characters/priya.json",
-    "src/assets/characters/sam.json"
+    "src/assets/characters/rex.json",
+    "src/assets/characters/rosa.json",
+    "src/assets/characters/sam.json",
+    "src/assets/characters/tank.json",
+    "src/assets/characters/walter.json",
+    "src/assets/characters/zoe.json"
   ],
   "scenes": [
     "src/assets/scenes/beach.json",

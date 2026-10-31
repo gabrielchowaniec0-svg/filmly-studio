@@ -1,0 +1,32 @@
+{
+  "id": "jade",
+  "name": "Jade",
+  "about": "Sharp-witted reporter.",
+  "rig": "humanoid",
+  "build": "slim",
+  "scale": 1,
+  "options": {
+    "hair": "pixie",
+    "top": "blazer",
+    "bottom": "pants",
+    "shoes": "flats",
+    "eyewear": "round",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#e0a982",
+    "hair": "#141012",
+    "brow": "#141012",
+    "eye": "#2a1810",
+    "top": "#2c3e66",
+    "top2": "#f4f4f0",
+    "bottom": "#2c3e66",
+    "shoes": "#1b1414",
+    "accent": "#c0392b"
+  },
+  "voice": "browser_uk_f"
+}

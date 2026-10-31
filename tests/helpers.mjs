@@ -5,7 +5,9 @@ export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const readJSON = (p) => JSON.parse(readFileSync(join(ROOT, p), 'utf8'));
 export function loadAssetsFs() {
   const m = readJSON('src/assets/manifest.json');
-  const A = { rigs: {}, characters: {}, scenes: {}, voices: {}, manifest: m };
+  const A = { rigs: {}, characters: {}, scenes: {}, voices: {}, props: {}, sounds: {}, manifest: m };
+  for (const p of m.props || []) { const j = readJSON(p); A.props[j.id] = j; }
+  if (m.sounds) for (const s of readJSON(m.sounds).sounds || []) A.sounds[s.id] = s;
   for (const p of m.rigs) { const j = readJSON(p); A.rigs[j.id] = j; }
   for (const p of m.characters) { const j = readJSON(p); A.characters[j.id] = j; }
   for (const p of m.scenes) { const j = readJSON(p); A.scenes[j.id] = j; }

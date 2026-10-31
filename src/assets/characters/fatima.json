@@ -1,0 +1,31 @@
+{
+  "id": "fatima",
+  "name": "Fatima",
+  "about": "Thoughtful writer with a big laugh.",
+  "rig": "humanoid",
+  "build": "regular",
+  "scale": 0.98,
+  "options": {
+    "hair": "hijab",
+    "top": "cardigan",
+    "bottom": "longskirt",
+    "shoes": "flats",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#c68a5e",
+    "hair": "#1e1a1a",
+    "brow": "#1e1a1a",
+    "eye": "#3a2618",
+    "top": "#c9805c",
+    "top2": "#f4efe2",
+    "bottom": "#4b5d7a",
+    "shoes": "#5a3b2a",
+    "accent": "#2f7d6b"
+  },
+  "voice": "browser_female"
+}

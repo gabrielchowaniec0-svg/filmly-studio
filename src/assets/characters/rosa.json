@@ -1,0 +1,31 @@
+{
+  "id": "rosa",
+  "name": "Rosa",
+  "about": "Elegant aunt who loves a party.",
+  "rig": "humanoid",
+  "build": "round",
+  "scale": 0.98,
+  "options": {
+    "hair": "shouldercurls",
+    "top": "gown",
+    "bottom": "bare",
+    "shoes": "heels",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#c68a5e",
+    "hair": "#2a1a14",
+    "brow": "#2a1a14",
+    "eye": "#3a2618",
+    "top": "#7a2a6a",
+    "top2": "#f2c14e",
+    "bottom": "#7a2a6a",
+    "shoes": "#f2c14e",
+    "accent": "#f2c14e"
+  },
+  "voice": "browser_warm"
+}

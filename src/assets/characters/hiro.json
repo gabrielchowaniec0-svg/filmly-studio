@@ -1,0 +1,32 @@
+{
+  "id": "hiro",
+  "name": "Hiro",
+  "about": "Quiet genius, always tinkering.",
+  "rig": "humanoid",
+  "build": "slim",
+  "scale": 1,
+  "options": {
+    "hair": "swoop",
+    "top": "labcoat",
+    "bottom": "pants",
+    "shoes": "dress",
+    "eyewear": "glasses",
+    "browStyle": "thin"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#f1c3a0",
+    "hair": "#141012",
+    "brow": "#141012",
+    "eye": "#2a1810",
+    "top": "#f4f4f0",
+    "top2": "#4a7fb5",
+    "bottom": "#3a3f4a",
+    "shoes": "#2a2420",
+    "accent": "#4a7fb5"
+  },
+  "voice": "browser_male"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "luna",
+  "name": "Luna",
+  "about": "Dreamy artist with paint on her hands.",
+  "rig": "humanoid",
+  "build": "slim",
+  "scale": 0.96,
+  "options": {
+    "hair": "spacebuns",
+    "top": "apron",
+    "bottom": "leggings",
+    "shoes": "sneakers",
+    "freckles": "freckles",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#f6d3b8",
+    "hair": "#7b5cd6",
+    "brow": "#5d43ad",
+    "eye": "#3c6e47",
+    "top": "#f2b134",
+    "top2": "#e8d6b0",
+    "bottom": "#2c2c3a",
+    "shoes": "#ff6fa8",
+    "accent": "#ff6fa8"
+  },
+  "voice": "browser_bright"
+}

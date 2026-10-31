@@ -1,60 +1,85 @@
-# Hello, Filmly — a short demo of most FilmScript features.
+# Hello, Filmly — a short demo of FilmScript: characters, props, effects, music and sound effects.
 # Voices: everyone uses your browser's built-in voices (free, preview only).
-# For sound in the exported MP4, open Voice Lab or change a voice to e.g.  voice=kokoro:af_heart  (free, in-browser).
+# For voices in the exported MP4, open Voice Lab or change a voice to e.g.  voice=kokoro:af_heart  (free, in-browser).
 film "Hello, Filmly" 1920x1080 @30
 fade in 0.8s
-voice host = browser_bright
-character rosa from priya hair=curly top=suit color.top=#2d6a8a color.top2=#f2b134 build=regular
+character detective_mira from mira top=coat color.top=#a8865a headwear=fedora color.accent=#4a3a2a
 
 scene living bg=living_room {
-  cast mira: mira at 22
+  cast mira: mira at 24
   cast bo: bo at 80 hidden
+  prop cup: mug at 34,4 hidden
+  music happy_day vol=0.35 fade=1s
 
   title "Hello, Filmly" 2.2s
   mira feels happy
   mira waves &
-  mira: "Hi! I'm Mira. This whole film is just a text file." voice=host
+  mira: "Hi! I'm Mira. This whole film is just a text file."
+  sfx doorbell
   bo enters from right over 2.2s &
   wait 1.2s
   mira looks at bo
   bo: "And I'm Bo. Every blink, step and lip shape is generated."
-  bo plays cross_arms for 2.5s &
-  mira: "Wait... was that a camera move?" mood=surprised
-  camera zoom=1.45 x=32 y=58 over 1.4s
-  mira laughs
-  mira: "It was!" mood=joy
-  camera zoom=1 x=50 y=50 over 1s &
-  mira walks to 42 over 1.4s
-  bo shrugs
-  bo: "Want to see the forest?"
-  mira nods
-  caption "Characters, voices, scenes and transitions are all just assets." 3s
+  bo plays thumbs_up &
+  mira: "Want some cocoa?"
+  cup shows
+  mira holds cup
+  mira walks to 58 over 1.4s
+  mira gives cup to bo
+  bo feels joy
+  bo: "Thanks! Hey... did you hear that?" mood=surprised
+  sfx door_creak
+  mira plays double_take
+  camera zoom=1.4 x=60 y=55 over 1.2s
+  caption "Characters, props, music and sound effects are all just assets." 3s
+}
+
+transition dip_black 1.2s
+
+scene hall bg=spooky_mansion_hall {
+  cast mira: detective_mira at 20
+  cast walter: walter at 82 facing=left
+  prop torch: flashlight at 26,4
+  prop chest: treasure_chest at 66,8
+  effect fog amount=0.6
+  effect vignette
+  music spooky_mystery vol=0.4 fade=1.5s
+  ambience haunted_house vol=0.4
+
+  mira holds torch
+  mira walks to 44 style=sneak over 3s
+  sfx owl_hoot
+  walter: "Nobody comes to Blackthorn Manor after dark."
+  mira feels worried
+  mira: "Then who left this chest open?"
+  walter plays scratch_head &
+  mira points
+  sfx thunder
+  effect lightning
+  mira gasps
+  walter cowers
+  caption "Scenes, effects and moods set the tone." 2.5s
 }
 
 transition iris 1.1s
 
-scene forest bg=night_forest {
-  cast juno: juno at 18
-  cast otto: otto at 82 facing=left
-  cast rosa: rosa at 60 hidden
+scene park bg=park_day {
+  cast zoe: zoe at 22
+  cast amara: amara at 72 facing=left
+  cast malik: malik at 50
+  prop ball: ball at 36,10
+  music epic_quest vol=0.35 fade=1s
+  ambience park_birds vol=0.5
+  effect sparkles amount=0.4
 
-  juno: "Is this the forest from the map?"
-  otto feels worried
-  otto thinks for 2s &
-  otto: "Hmm. Quiet now. Walk with me."
+  zoe: "Is that the end?"
+  amara: "Only of the demo. Now make your own film!"
   par {
-    juno walks to 46 over 2.6s
-    otto walks to 70 over 2.6s
+    zoe jumps
+    amara celebrates
+    malik plays dance
   }
-  rosa enters from right over 1.6s &
-  juno looks at rosa
-  rosa: "You two! You're late for the show!"
-  juno feels joy
-  juno jumps
-  otto feels happy
-  juno dances &
-  rosa claps &
-  otto: "Ha! Well then, let's go."
+  sfx success_fanfare
   caption "Export to MP4 — 720p to 8K." 2.5s
 }
 

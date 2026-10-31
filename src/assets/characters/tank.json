@@ -1,0 +1,31 @@
+{
+  "id": "tank",
+  "name": "Tank",
+  "about": "Big-hearted security guard.",
+  "rig": "humanoid",
+  "build": "broad",
+  "scale": 1.08,
+  "options": {
+    "hair": "mohawk",
+    "top": "uniform",
+    "bottom": "pants",
+    "shoes": "boots",
+    "headwear": "police"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#8d5a3b",
+    "hair": "#141012",
+    "brow": "#141012",
+    "eye": "#21140c",
+    "top": "#2c3e66",
+    "top2": "#f2c14e",
+    "bottom": "#1f2a44",
+    "shoes": "#111",
+    "accent": "#2c3e66"
+  },
+  "voice": "browser_deep"
+}

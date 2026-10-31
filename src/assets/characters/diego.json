@@ -1,0 +1,32 @@
+{
+  "id": "diego",
+  "name": "Diego",
+  "about": "Chef who sings while he cooks.",
+  "rig": "humanoid",
+  "build": "round",
+  "scale": 1.02,
+  "options": {
+    "hair": "curlytop",
+    "top": "buttonup",
+    "bottom": "pants",
+    "shoes": "dress",
+    "headwear": "chef",
+    "facial": "mustache"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#a86b45",
+    "hair": "#1a120e",
+    "brow": "#1a120e",
+    "eye": "#2a1810",
+    "top": "#f4f4f0",
+    "top2": "#c0392b",
+    "bottom": "#2b2b33",
+    "shoes": "#1b1414",
+    "accent": "#f4f4f0"
+  },
+  "voice": "browser_deep"
+}

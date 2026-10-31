@@ -1,0 +1,33 @@
+{
+  "id": "rex",
+  "name": "Rex",
+  "about": "Gruff detective in a trench coat.",
+  "rig": "humanoid",
+  "build": "tall",
+  "scale": 1.04,
+  "options": {
+    "hair": "slicked",
+    "top": "coat",
+    "bottom": "pants",
+    "shoes": "boots",
+    "headwear": "fedora",
+    "facial": "stubble",
+    "browStyle": "thick"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#e0a982",
+    "hair": "#2a1e18",
+    "brow": "#2a1e18",
+    "eye": "#3a2a1e",
+    "top": "#a8865a",
+    "top2": "#ece3cf",
+    "bottom": "#3a3530",
+    "shoes": "#2a1d14",
+    "accent": "#4a3a2a"
+  },
+  "voice": "browser_deep"
+}

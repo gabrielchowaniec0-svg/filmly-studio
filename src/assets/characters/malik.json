@@ -1,0 +1,31 @@
+{
+  "id": "malik",
+  "name": "Malik",
+  "about": "Easy-going musician.",
+  "rig": "humanoid",
+  "build": "regular",
+  "scale": 1.02,
+  "options": {
+    "hair": "locs",
+    "top": "denim",
+    "bottom": "cargo",
+    "shoes": "boots",
+    "headwear": "headphones"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#4f2e1d",
+    "hair": "#120c0a",
+    "brow": "#120c0a",
+    "eye": "#1c120c",
+    "top": "#4a6fa5",
+    "top2": "#f4f1ea",
+    "bottom": "#5b5b3a",
+    "shoes": "#4a3020",
+    "accent": "#e4572e"
+  },
+  "voice": "browser_teen"
+}

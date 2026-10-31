@@ -1,0 +1,32 @@
+{
+  "id": "walter",
+  "name": "Walter",
+  "about": "Old groundskeeper who knows every secret.",
+  "rig": "humanoid",
+  "build": "elder",
+  "scale": 1,
+  "options": {
+    "hair": "combover",
+    "top": "puffer",
+    "bottom": "pants",
+    "shoes": "boots",
+    "facial": "beard",
+    "browStyle": "thick"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#f0d2b8",
+    "hair": "#d9d9d9",
+    "brow": "#bdbdbd",
+    "eye": "#4a5a6b",
+    "top": "#2f5d4a",
+    "top2": "#c9b38a",
+    "bottom": "#5a4a3a",
+    "shoes": "#3a2e26",
+    "accent": "#7b4b2a"
+  },
+  "voice": "browser_elder_m"
+}

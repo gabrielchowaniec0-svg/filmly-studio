@@ -1,0 +1,32 @@
+{
+  "id": "zoe",
+  "name": "Zoe",
+  "about": "Fearless kid explorer.",
+  "rig": "humanoid",
+  "build": "kid",
+  "scale": 0.9,
+  "options": {
+    "hair": "pigtails",
+    "top": "overalls",
+    "bottom": "pants",
+    "shoes": "rainboots",
+    "freckles": "freckles",
+    "lashes": "lashes"
+  },
+  "palette": {
+    "blush": "#ff7d7d",
+    "sole": "#f4f1ea",
+    "outline": "#2a1d1d",
+    "frame": "#2a2f3a",
+    "skin": "#f1c3a0",
+    "hair": "#b5431f",
+    "brow": "#8a3216",
+    "eye": "#3d6fa8",
+    "top": "#f2e9b8",
+    "top2": "#f2e9b8",
+    "bottom": "#3b6ea8",
+    "shoes": "#f2c14e",
+    "accent": "#e4572e"
+  },
+  "voice": "browser_kid"
+}
