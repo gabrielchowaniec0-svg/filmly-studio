@@ -1,0 +1,42 @@
+# Hello, Filmly — a tiny demo that shows most FilmScript features.
+film "Hello, Filmly" 1920x1080 @30
+fade in 0.8s
+
+scene living bg=living_room {
+  cast mira: mira at 22
+  cast bo: bo at 78 hidden
+  cast juno: juno at 55,20 hidden
+
+  title "Hello, Filmly" 2.2s
+  mira feels happy
+  mira: "Hi! I'm Mira, and this is a film made from plain text."
+  bo enters from right over 2s &
+  mira waves
+  bo: "And I'm Bo. Those files you're reading are the whole movie."
+  bo feels surprised
+  mira: "Wait... was that a camera move?" mood=surprised
+  camera zoom=1.5 x=30 y=60 over 1.5s
+  mira: "Oh! It was."
+  camera zoom=1 x=50 y=50 over 1s &
+  mira walks to 40 over 1.2s
+  bo shrugs
+  caption "Characters, voices, scenes and transitions are all just assets." 3s
+}
+
+transition iris 1s
+
+scene night bg=night_forest {
+  cast juno: juno at 20
+  cast otto: otto at 80 facing=left
+
+  juno: "Is this the forest from the map?"
+  otto: "Quiet now. Walk with me." mood=sad
+  par {
+    juno walks to 62 over 3s
+    otto walks to 82 over 3s
+  }
+  juno plays cheer
+  caption "Export to MP4 at any resolution." 2.5s
+}
+
+fade out 0.8s

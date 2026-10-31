@@ -1,0 +1,11 @@
+{
+  "id": "studio",
+  "name": "Plain studio",
+  "type": "interior",
+  "floorY": 790,
+  "layers": [
+    { "type": "rect", "x": 0, "y": 0, "w": 1920, "h": 790, "fill": { "stops": [[0, "#dfe7f2"], [1, "#f6f1e7"]], "x0": 0, "y0": 0, "x1": 0, "y1": 790 }, "stroke": null },
+    { "type": "rect", "x": 0, "y": 790, "w": 1920, "h": 290, "fill": { "stops": [[0, "#b99b78"], [1, "#8d7357"]], "x0": 0, "y0": 790, "x1": 0, "y1": 1080 }, "stroke": null },
+    { "type": "rect", "x": 0, "y": 780, "w": 1920, "h": 14, "fill": "#7a6247", "stroke": null }
+  ]
+}

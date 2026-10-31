@@ -1,0 +1,22 @@
+{
+  "id": "street_day",
+  "name": "Street (day)",
+  "type": "exterior",
+  "floorY": 820,
+  "layers": [
+    { "type": "rect", "x": 0, "y": 0, "w": 1920, "h": 560, "fill": { "stops": [[0, "#6ec1ee"], [1, "#d6f0fb"]], "x0": 0, "y0": 0, "x1": 0, "y1": 560 }, "stroke": null },
+    { "type": "ellipse", "cx": 1580, "cy": 170, "rx": 78, "ry": 78, "fill": "#ffe27a", "stroke": null },
+    { "type": "ellipse", "cx": 360, "cy": 160, "rx": 150, "ry": 44, "fill": "#ffffff", "stroke": null, "alpha": 0.9 },
+    { "type": "ellipse", "cx": 460, "cy": 135, "rx": 110, "ry": 40, "fill": "#ffffff", "stroke": null, "alpha": 0.9 },
+    { "type": "ellipse", "cx": 1100, "cy": 250, "rx": 130, "ry": 36, "fill": "#ffffff", "stroke": null, "alpha": 0.85 },
+    { "type": "rect", "x": 80, "y": 300, "w": 300, "h": 300, "fill": "#e8a87c", "stroke": "#7a4a30", "lw": 6 },
+    { "type": "rect", "x": 420, "y": 220, "w": 260, "h": 380, "fill": "#c38d9e", "stroke": "#6b3f4e", "lw": 6 },
+    { "type": "rect", "x": 1250, "y": 260, "w": 320, "h": 340, "fill": "#85b6a1", "stroke": "#3f6b58", "lw": 6 },
+    { "type": "rect", "x": 1610, "y": 330, "w": 260, "h": 270, "fill": "#e9d58b", "stroke": "#8a7430", "lw": 6 },
+    { "type": "path", "d": "M120 360 h60 v70 h-60z M220 360 h60 v70 h-60z M120 470 h60 v70 h-60z M220 470 h60 v70 h-60z M470 280 h60 v70 h-60z M570 280 h60 v70 h-60z M470 400 h60 v70 h-60z M570 400 h60 v70 h-60z M1300 320 h70 v80 h-70z M1440 320 h70 v80 h-70z M1300 450 h70 v80 h-70z M1440 450 h70 v80 h-70z", "fill": "#bfe3f5", "stroke": "#3c4a55", "lw": 4 },
+    { "type": "rect", "x": 0, "y": 560, "w": 1920, "h": 120, "fill": "#6fae5e", "stroke": null },
+    { "type": "rect", "x": 0, "y": 680, "w": 1920, "h": 70, "fill": "#cfc6b8", "stroke": null },
+    { "type": "rect", "x": 0, "y": 750, "w": 1920, "h": 330, "fill": { "stops": [[0, "#5a5f69"], [1, "#454952"]], "x0": 0, "y0": 750, "x1": 0, "y1": 1080 }, "stroke": null },
+    { "type": "path", "d": "M0 960 h160 M280 960 h160 M560 960 h160 M840 960 h160 M1120 960 h160 M1400 960 h160 M1680 960 h160", "stroke": "#f2e9b8", "lw": 12 }
+  ]
+}

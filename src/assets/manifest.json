@@ -1,0 +1,21 @@
+{
+  "rigs": [
+    "src/assets/rigs/humanoid.json"
+  ],
+  "characters": [
+    "src/assets/characters/bo.json",
+    "src/assets/characters/juno.json",
+    "src/assets/characters/mira.json",
+    "src/assets/characters/otto.json"
+  ],
+  "scenes": [
+    "src/assets/scenes/living_room.json",
+    "src/assets/scenes/night_forest.json",
+    "src/assets/scenes/street_day.json",
+    "src/assets/scenes/studio.json"
+  ],
+  "voices": "src/assets/voices/voices.json",
+  "films": [
+    "films/hello-filmly.fly"
+  ]
+}

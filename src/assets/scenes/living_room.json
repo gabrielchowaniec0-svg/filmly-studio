@@ -1,0 +1,25 @@
+{
+  "id": "living_room",
+  "name": "Living room",
+  "type": "interior",
+  "floorY": 800,
+  "layers": [
+    { "type": "rect", "x": 0, "y": 0, "w": 1920, "h": 800, "fill": "#f1dfc6", "stroke": null },
+    { "type": "rect", "x": 0, "y": 640, "w": 1920, "h": 160, "fill": "#d9c3a0", "stroke": null },
+    { "type": "rect", "x": 0, "y": 800, "w": 1920, "h": 280, "fill": { "stops": [[0, "#a9764a"], [1, "#7c5232"]], "x0": 0, "y0": 800, "x1": 0, "y1": 1080 }, "stroke": null },
+    { "type": "rect", "x": 0, "y": 792, "w": 1920, "h": 16, "fill": "#5b3d26", "stroke": null },
+    { "type": "rect", "x": 1180, "y": 120, "w": 420, "h": 330, "r": 10, "fill": "#bfe3f5", "stroke": "#5b3d26", "lw": 14 },
+    { "type": "path", "d": "M1390 120 L1390 450 M1180 285 L1600 285", "stroke": "#5b3d26", "lw": 10 },
+    { "type": "rect", "x": 1120, "y": 100, "w": 60, "h": 380, "r": 8, "fill": "#c0504d", "stroke": null, "alpha": 0.9 },
+    { "type": "rect", "x": 1600, "y": 100, "w": 60, "h": 380, "r": 8, "fill": "#c0504d", "stroke": null, "alpha": 0.9 },
+    { "type": "rect", "x": 140, "y": 560, "w": 560, "h": 220, "r": 40, "fill": "#5a7bb0", "stroke": "#2e4468", "lw": 6 },
+    { "type": "rect", "x": 140, "y": 470, "w": 560, "h": 140, "r": 40, "fill": "#6b8cc2", "stroke": "#2e4468", "lw": 6 },
+    { "type": "rect", "x": 120, "y": 540, "w": 80, "h": 240, "r": 36, "fill": "#4f6fa3", "stroke": "#2e4468", "lw": 6 },
+    { "type": "rect", "x": 640, "y": 540, "w": 80, "h": 240, "r": 36, "fill": "#4f6fa3", "stroke": "#2e4468", "lw": 6 },
+    { "type": "rect", "x": 760, "y": 240, "w": 260, "h": 190, "r": 6, "fill": "#e8c27a", "stroke": "#5b3d26", "lw": 12 },
+    { "type": "ellipse", "cx": 890, "cy": 335, "rx": 70, "ry": 52, "fill": "#7fb77e", "stroke": null },
+    { "type": "ellipse", "cx": 1680, "cy": 780, "rx": 90, "ry": 14, "fill": "#000000", "stroke": null, "alpha": 0.18 },
+    { "type": "rect", "x": 1650, "y": 640, "w": 60, "h": 140, "r": 10, "fill": "#a3532f", "stroke": "#5b2f1a", "lw": 5 },
+    { "type": "ellipse", "cx": 1680, "cy": 600, "rx": 78, "ry": 62, "fill": "#4c9a5a", "stroke": "#2d5f37", "lw": 5 }
+  ]
+}

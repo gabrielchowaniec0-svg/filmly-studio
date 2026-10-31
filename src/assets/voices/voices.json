@@ -1,0 +1,11 @@
+{
+  "note": "engine: blip = synthesized offline, always exportable | file = pre-recorded audio | elevenlabs = API (needs key, audio cached then exportable) | webspeech = browser TTS, preview only (cannot be captured into MP4).",
+  "voices": [
+    { "id": "voice_mira", "name": "Mira (bright blips)", "engine": "blip", "pitch": 330, "wave": "triangle", "rate": 1.0, "variation": 0.22 },
+    { "id": "voice_bo", "name": "Bo (mellow blips)", "engine": "blip", "pitch": 190, "wave": "square", "rate": 0.95, "variation": 0.18 },
+    { "id": "voice_juno", "name": "Juno (squeaky blips)", "engine": "blip", "pitch": 470, "wave": "sine", "rate": 1.1, "variation": 0.28 },
+    { "id": "voice_otto", "name": "Otto (deep blips)", "engine": "blip", "pitch": 120, "wave": "sawtooth", "rate": 0.85, "variation": 0.12 },
+    { "id": "narrator_webspeech", "name": "Narrator (browser TTS, preview only)", "engine": "webspeech", "pitch": 1.0, "rate": 1.0, "lang": "en-US" },
+    { "id": "narrator_elevenlabs", "name": "Narrator (ElevenLabs)", "engine": "elevenlabs", "voiceId": "REPLACE_WITH_ELEVENLABS_VOICE_ID", "model": "eleven_multilingual_v2" }
+  ]
+}

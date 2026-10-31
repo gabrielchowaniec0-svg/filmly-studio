@@ -1,0 +1,12 @@
+{
+  "name": "filmly-studio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Digital art assets + an editor + a tiny language (FilmScript) for making 2D short films in the browser and exporting them to MP4.",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "manifest": "node scripts/build-manifest.mjs",
+    "test": "node --test tests/*.test.mjs"
+  }
+}

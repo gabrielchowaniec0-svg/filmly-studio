@@ -1,0 +1,9 @@
+{
+  "id": "juno",
+  "name": "Juno",
+  "rig": "humanoid",
+  "scale": 0.88,
+  "options": { "hair": "bun", "outfit": "tee", "accessory": "hat" },
+  "palette": { "skin": "#8d5a3b", "hair": "#16110f", "shirt": "#f2b134", "shirt2": "#c98e1c", "pants": "#2f5d8a", "shoes": "#d9d2c3", "eye": "#1d1410", "outline": "#1a1313", "accent": "#e4572e" },
+  "voice": "voice_juno"
+}

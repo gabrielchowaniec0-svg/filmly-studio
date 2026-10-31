@@ -1,0 +1,18 @@
+{
+  "id": "night_forest",
+  "name": "Night forest",
+  "type": "exterior",
+  "floorY": 840,
+  "layers": [
+    { "type": "rect", "x": 0, "y": 0, "w": 1920, "h": 1080, "fill": { "stops": [[0, "#0b1030"], [0.7, "#1d2a5c"], [1, "#2d3b73"]], "x0": 0, "y0": 0, "x1": 0, "y1": 840 }, "stroke": null },
+    { "type": "ellipse", "cx": 1500, "cy": 190, "rx": 100, "ry": 100, "fill": "#f6f1d1", "stroke": null },
+    { "type": "ellipse", "cx": 1470, "cy": 170, "rx": 18, "ry": 18, "fill": "#e1dbb5", "stroke": null },
+    { "type": "path", "d": "M200 120 l6 6 -6 6 -6 -6z M520 260 l5 5 -5 5 -5 -5z M860 90 l6 6 -6 6 -6 -6z M1040 300 l4 4 -4 4 -4 -4z M1250 140 l5 5 -5 5 -5 -5z M1760 330 l5 5 -5 5 -5 -5z M330 380 l4 4 -4 4 -4 -4z", "fill": "#ffffff", "stroke": null },
+    { "type": "path", "d": "M0 640 L120 380 L240 640 Z M180 660 L340 320 L500 660 Z M520 640 L680 400 L840 640 Z M900 670 L1080 300 L1260 670 Z M1280 640 L1440 410 L1600 640 Z M1560 670 L1740 340 L1920 670 Z", "fill": "#0f1b3d", "stroke": null },
+    { "type": "rect", "x": 0, "y": 640, "w": 1920, "h": 440, "fill": { "stops": [[0, "#1e3a2a"], [1, "#122418"]], "x0": 0, "y0": 640, "x1": 0, "y1": 1080 }, "stroke": null },
+    { "type": "rect", "x": 130, "y": 300, "w": 70, "h": 560, "fill": "#2b1d17", "stroke": null },
+    { "type": "ellipse", "cx": 165, "cy": 290, "rx": 190, "ry": 170, "fill": "#14301f", "stroke": null },
+    { "type": "rect", "x": 1700, "y": 280, "w": 80, "h": 580, "fill": "#2b1d17", "stroke": null },
+    { "type": "ellipse", "cx": 1740, "cy": 270, "rx": 210, "ry": 180, "fill": "#14301f", "stroke": null }
+  ]
+}

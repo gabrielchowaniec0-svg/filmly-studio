@@ -1,0 +1,9 @@
+{
+  "id": "mira",
+  "name": "Mira",
+  "rig": "humanoid",
+  "scale": 1,
+  "options": { "hair": "long", "outfit": "dress", "accessory": "bow" },
+  "palette": { "skin": "#f2c7a5", "hair": "#4a2a18", "shirt": "#e0526f", "shirt2": "#b83d58", "pants": "#3b3f6b", "shoes": "#2a2438", "eye": "#3a2a20", "outline": "#2a1b1b", "accent": "#ffd166" },
+  "voice": "voice_mira"
+}

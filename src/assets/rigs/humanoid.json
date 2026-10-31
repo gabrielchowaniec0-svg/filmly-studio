@@ -1,0 +1,2426 @@
+{
+  "id": "humanoid",
+  "name": "Humanoid (front view)",
+  "height": 360,
+  "style": {
+    "stroke": "$outline",
+    "lw": 4
+  },
+  "bones": [
+    {
+      "id": "root",
+      "parent": null,
+      "pos": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "hips",
+      "parent": "root",
+      "pos": [
+        0,
+        -150
+      ]
+    },
+    {
+      "id": "torso",
+      "parent": "hips",
+      "pos": [
+        0,
+        0
+      ]
+    },
+    {
+      "id": "head",
+      "parent": "torso",
+      "pos": [
+        0,
+        -105
+      ]
+    },
+    {
+      "id": "armL",
+      "parent": "torso",
+      "pos": [
+        -40,
+        -90
+      ]
+    },
+    {
+      "id": "foreL",
+      "parent": "armL",
+      "pos": [
+        0,
+        60
+      ]
+    },
+    {
+      "id": "armR",
+      "parent": "torso",
+      "pos": [
+        40,
+        -90
+      ]
+    },
+    {
+      "id": "foreR",
+      "parent": "armR",
+      "pos": [
+        0,
+        60
+      ]
+    },
+    {
+      "id": "thighL",
+      "parent": "hips",
+      "pos": [
+        -20,
+        0
+      ]
+    },
+    {
+      "id": "shinL",
+      "parent": "thighL",
+      "pos": [
+        0,
+        75
+      ]
+    },
+    {
+      "id": "thighR",
+      "parent": "hips",
+      "pos": [
+        20,
+        0
+      ]
+    },
+    {
+      "id": "shinR",
+      "parent": "thighR",
+      "pos": [
+        0,
+        75
+      ]
+    }
+  ],
+  "slots": {
+    "eyes": {
+      "default": "open",
+      "options": [
+        "open",
+        "blink",
+        "happy",
+        "wide"
+      ]
+    },
+    "brows": {
+      "default": "neutral",
+      "options": [
+        "neutral",
+        "happy",
+        "sad",
+        "angry",
+        "surprised"
+      ]
+    },
+    "mouth": {
+      "default": "closed",
+      "options": [
+        "closed",
+        "half",
+        "open_a",
+        "open_o",
+        "smile",
+        "sad",
+        "wow"
+      ]
+    },
+    "hair": {
+      "default": "short",
+      "options": [
+        "short",
+        "spiky",
+        "bob",
+        "long",
+        "bun",
+        "bald"
+      ]
+    },
+    "outfit": {
+      "default": "tee",
+      "options": [
+        "tee",
+        "hoodie",
+        "dress"
+      ]
+    },
+    "accessory": {
+      "default": "none",
+      "options": [
+        "none",
+        "glasses",
+        "hat",
+        "bow"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "thighL",
+      "bone": "thighL",
+      "z": 1,
+      "fill": "$pants",
+      "shape": {
+        "type": "rect",
+        "x": -15,
+        "y": -6,
+        "w": 30,
+        "h": 86,
+        "r": 13
+      }
+    },
+    {
+      "id": "shinL",
+      "bone": "shinL",
+      "z": 1,
+      "fill": "$pants",
+      "shape": {
+        "type": "rect",
+        "x": -13,
+        "y": -6,
+        "w": 26,
+        "h": 82,
+        "r": 11
+      }
+    },
+    {
+      "id": "shoeL",
+      "bone": "shinL",
+      "z": 2,
+      "fill": "$shoes",
+      "shape": {
+        "type": "ellipse",
+        "cx": -4,
+        "cy": 76,
+        "rx": 25,
+        "ry": 11
+      }
+    },
+    {
+      "id": "thighR",
+      "bone": "thighR",
+      "z": 1,
+      "fill": "$pants",
+      "shape": {
+        "type": "rect",
+        "x": -15,
+        "y": -6,
+        "w": 30,
+        "h": 86,
+        "r": 13
+      }
+    },
+    {
+      "id": "shinR",
+      "bone": "shinR",
+      "z": 1,
+      "fill": "$pants",
+      "shape": {
+        "type": "rect",
+        "x": -13,
+        "y": -6,
+        "w": 26,
+        "h": 82,
+        "r": 11
+      }
+    },
+    {
+      "id": "shoeR",
+      "bone": "shinR",
+      "z": 2,
+      "fill": "$shoes",
+      "shape": {
+        "type": "ellipse",
+        "cx": 4,
+        "cy": 76,
+        "rx": 25,
+        "ry": 11
+      }
+    },
+    {
+      "id": "pelvis",
+      "bone": "hips",
+      "z": 3,
+      "fill": "$pants",
+      "shape": {
+        "type": "rect",
+        "x": -44,
+        "y": -8,
+        "w": 88,
+        "h": 36,
+        "r": 14
+      }
+    },
+    {
+      "id": "torso",
+      "bone": "torso",
+      "z": 4,
+      "fill": "$shirt",
+      "shape": {
+        "type": "rect",
+        "x": -46,
+        "y": -108,
+        "w": 92,
+        "h": 120,
+        "r": 30
+      }
+    },
+    {
+      "id": "upperArmL",
+      "bone": "armL",
+      "z": 6,
+      "fill": "$shirt",
+      "shape": {
+        "type": "rect",
+        "x": -13,
+        "y": -12,
+        "w": 26,
+        "h": 72,
+        "r": 13
+      }
+    },
+    {
+      "id": "foreArmL",
+      "bone": "foreL",
+      "z": 6,
+      "fill": "$skin",
+      "shape": {
+        "type": "rect",
+        "x": -11,
+        "y": -6,
+        "w": 22,
+        "h": 56,
+        "r": 11
+      }
+    },
+    {
+      "id": "handL",
+      "bone": "foreL",
+      "z": 6,
+      "fill": "$skin",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": 56,
+        "rx": 14,
+        "ry": 15
+      }
+    },
+    {
+      "id": "upperArmR",
+      "bone": "armR",
+      "z": 6,
+      "fill": "$shirt",
+      "shape": {
+        "type": "rect",
+        "x": -13,
+        "y": -12,
+        "w": 26,
+        "h": 72,
+        "r": 13
+      }
+    },
+    {
+      "id": "foreArmR",
+      "bone": "foreR",
+      "z": 6,
+      "fill": "$skin",
+      "shape": {
+        "type": "rect",
+        "x": -11,
+        "y": -6,
+        "w": 22,
+        "h": 56,
+        "r": 11
+      }
+    },
+    {
+      "id": "handR",
+      "bone": "foreR",
+      "z": 6,
+      "fill": "$skin",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": 56,
+        "rx": 14,
+        "ry": 15
+      }
+    },
+    {
+      "id": "neck",
+      "bone": "head",
+      "z": 7,
+      "fill": "$skin",
+      "shape": {
+        "type": "rect",
+        "x": -12,
+        "y": -14,
+        "w": 24,
+        "h": 26,
+        "r": 6
+      }
+    },
+    {
+      "id": "earL",
+      "bone": "head",
+      "z": 9,
+      "fill": "$skin",
+      "shape": {
+        "type": "ellipse",
+        "cx": -56,
+        "cy": -52,
+        "rx": 9,
+        "ry": 13
+      }
+    },
+    {
+      "id": "earR",
+      "bone": "head",
+      "z": 9,
+      "fill": "$skin",
+      "shape": {
+        "type": "ellipse",
+        "cx": 56,
+        "cy": -52,
+        "rx": 9,
+        "ry": 13
+      }
+    },
+    {
+      "id": "head",
+      "bone": "head",
+      "z": 10,
+      "fill": "$skin",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": -55,
+        "rx": 57,
+        "ry": 58
+      }
+    },
+    {
+      "id": "dress",
+      "bone": "hips",
+      "z": 5,
+      "slot": "outfit",
+      "option": "dress",
+      "fill": "$shirt",
+      "shape": {
+        "type": "path",
+        "d": "M-46 -6 L46 -6 Q72 40 68 88 Q0 104 -68 88 Q-72 40 -46 -6 Z"
+      }
+    },
+    {
+      "id": "hoodPocket",
+      "bone": "torso",
+      "z": 5,
+      "slot": "outfit",
+      "option": "hoodie",
+      "fill": "$shirt2",
+      "shape": {
+        "type": "rect",
+        "x": -30,
+        "y": -24,
+        "w": 60,
+        "h": 28,
+        "r": 12
+      }
+    },
+    {
+      "id": "hoodBack",
+      "bone": "head",
+      "z": 8,
+      "slot": "outfit",
+      "option": "hoodie",
+      "fill": "$shirt2",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": -14,
+        "rx": 64,
+        "ry": 34
+      }
+    },
+    {
+      "id": "eyesOpenL",
+      "bone": "head",
+      "z": 11,
+      "slot": "eyes",
+      "option": "open",
+      "fill": "#ffffff",
+      "lw": 3,
+      "shape": {
+        "type": "ellipse",
+        "cx": -22,
+        "cy": -52,
+        "rx": 12,
+        "ry": 15
+      }
+    },
+    {
+      "id": "eyesOpenR",
+      "bone": "head",
+      "z": 11,
+      "slot": "eyes",
+      "option": "open",
+      "fill": "#ffffff",
+      "lw": 3,
+      "shape": {
+        "type": "ellipse",
+        "cx": 22,
+        "cy": -52,
+        "rx": 12,
+        "ry": 15
+      }
+    },
+    {
+      "id": "pupilOpenL",
+      "bone": "head",
+      "z": 12,
+      "slot": "eyes",
+      "option": "open",
+      "fill": "$eye",
+      "stroke": null,
+      "shape": {
+        "type": "ellipse",
+        "cx": -21,
+        "cy": -51,
+        "rx": 6.5,
+        "ry": 8.5
+      }
+    },
+    {
+      "id": "pupilOpenR",
+      "bone": "head",
+      "z": 12,
+      "slot": "eyes",
+      "option": "open",
+      "fill": "$eye",
+      "stroke": null,
+      "shape": {
+        "type": "ellipse",
+        "cx": 23,
+        "cy": -51,
+        "rx": 6.5,
+        "ry": 8.5
+      }
+    },
+    {
+      "id": "eyesWideL",
+      "bone": "head",
+      "z": 11,
+      "slot": "eyes",
+      "option": "wide",
+      "fill": "#ffffff",
+      "lw": 3,
+      "shape": {
+        "type": "ellipse",
+        "cx": -22,
+        "cy": -53,
+        "rx": 14,
+        "ry": 18
+      }
+    },
+    {
+      "id": "eyesWideR",
+      "bone": "head",
+      "z": 11,
+      "slot": "eyes",
+      "option": "wide",
+      "fill": "#ffffff",
+      "lw": 3,
+      "shape": {
+        "type": "ellipse",
+        "cx": 22,
+        "cy": -53,
+        "rx": 14,
+        "ry": 18
+      }
+    },
+    {
+      "id": "pupilWideL",
+      "bone": "head",
+      "z": 12,
+      "slot": "eyes",
+      "option": "wide",
+      "fill": "$eye",
+      "stroke": null,
+      "shape": {
+        "type": "ellipse",
+        "cx": -22,
+        "cy": -53,
+        "rx": 5,
+        "ry": 6.5
+      }
+    },
+    {
+      "id": "pupilWideR",
+      "bone": "head",
+      "z": 12,
+      "slot": "eyes",
+      "option": "wide",
+      "fill": "$eye",
+      "stroke": null,
+      "shape": {
+        "type": "ellipse",
+        "cx": 22,
+        "cy": -53,
+        "rx": 5,
+        "ry": 6.5
+      }
+    },
+    {
+      "id": "eyesBlinkL",
+      "bone": "head",
+      "z": 11,
+      "slot": "eyes",
+      "option": "blink",
+      "shape": {
+        "type": "path",
+        "d": "M-34 -52 Q-22 -45 -10 -52"
+      }
+    },
+    {
+      "id": "eyesBlinkR",
+      "bone": "head",
+      "z": 11,
+      "slot": "eyes",
+      "option": "blink",
+      "shape": {
+        "type": "path",
+        "d": "M10 -52 Q22 -45 34 -52"
+      }
+    },
+    {
+      "id": "eyesHappyL",
+      "bone": "head",
+      "z": 11,
+      "slot": "eyes",
+      "option": "happy",
+      "shape": {
+        "type": "path",
+        "d": "M-34 -47 Q-22 -62 -10 -47"
+      }
+    },
+    {
+      "id": "eyesHappyR",
+      "bone": "head",
+      "z": 11,
+      "slot": "eyes",
+      "option": "happy",
+      "shape": {
+        "type": "path",
+        "d": "M10 -47 Q22 -62 34 -47"
+      }
+    },
+    {
+      "id": "browsNeutralL",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "neutral",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M-36 -77 L-10 -79"
+      }
+    },
+    {
+      "id": "browsNeutralR",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "neutral",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M10 -79 L36 -77"
+      }
+    },
+    {
+      "id": "browsHappyL",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "happy",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M-36 -77 Q-22 -88 -10 -80"
+      }
+    },
+    {
+      "id": "browsHappyR",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "happy",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M10 -80 Q22 -88 36 -77"
+      }
+    },
+    {
+      "id": "browsSadL",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "sad",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M-36 -72 L-10 -80"
+      }
+    },
+    {
+      "id": "browsSadR",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "sad",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M10 -80 L36 -72"
+      }
+    },
+    {
+      "id": "browsAngryL",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "angry",
+      "lw": 6,
+      "shape": {
+        "type": "path",
+        "d": "M-36 -84 L-10 -72"
+      }
+    },
+    {
+      "id": "browsAngryR",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "angry",
+      "lw": 6,
+      "shape": {
+        "type": "path",
+        "d": "M10 -72 L36 -84"
+      }
+    },
+    {
+      "id": "browsSurprisedL",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "surprised",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M-36 -86 Q-22 -98 -10 -88"
+      }
+    },
+    {
+      "id": "browsSurprisedR",
+      "bone": "head",
+      "z": 12,
+      "slot": "brows",
+      "option": "surprised",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M10 -88 Q22 -98 36 -86"
+      }
+    },
+    {
+      "id": "mouthClosed",
+      "bone": "head",
+      "z": 11,
+      "slot": "mouth",
+      "option": "closed",
+      "shape": {
+        "type": "path",
+        "d": "M-14 -24 Q0 -20 14 -24"
+      }
+    },
+    {
+      "id": "mouthHalf",
+      "bone": "head",
+      "z": 11,
+      "slot": "mouth",
+      "option": "half",
+      "fill": "#5a1d1d",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": -23,
+        "rx": 12,
+        "ry": 5
+      }
+    },
+    {
+      "id": "mouthA",
+      "bone": "head",
+      "z": 11,
+      "slot": "mouth",
+      "option": "open_a",
+      "fill": "#5a1d1d",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": -21,
+        "rx": 14,
+        "ry": 12
+      }
+    },
+    {
+      "id": "mouthO",
+      "bone": "head",
+      "z": 11,
+      "slot": "mouth",
+      "option": "open_o",
+      "fill": "#5a1d1d",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": -21,
+        "rx": 8,
+        "ry": 11
+      }
+    },
+    {
+      "id": "mouthSmile",
+      "bone": "head",
+      "z": 11,
+      "slot": "mouth",
+      "option": "smile",
+      "shape": {
+        "type": "path",
+        "d": "M-19 -29 Q0 -8 19 -29"
+      }
+    },
+    {
+      "id": "mouthSad",
+      "bone": "head",
+      "z": 11,
+      "slot": "mouth",
+      "option": "sad",
+      "shape": {
+        "type": "path",
+        "d": "M-14 -17 Q0 -28 14 -17"
+      }
+    },
+    {
+      "id": "mouthWow",
+      "bone": "head",
+      "z": 11,
+      "slot": "mouth",
+      "option": "wow",
+      "fill": "#5a1d1d",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": -19,
+        "rx": 9,
+        "ry": 14
+      }
+    },
+    {
+      "id": "hairShort",
+      "bone": "head",
+      "z": 13,
+      "slot": "hair",
+      "option": "short",
+      "fill": "$hair",
+      "shape": {
+        "type": "path",
+        "d": "M-59 -58 Q-64 -120 0 -122 Q64 -120 59 -58 Q42 -94 0 -94 Q-42 -94 -59 -58 Z"
+      }
+    },
+    {
+      "id": "hairSpiky",
+      "bone": "head",
+      "z": 13,
+      "slot": "hair",
+      "option": "spiky",
+      "fill": "$hair",
+      "shape": {
+        "type": "path",
+        "d": "M-59 -62 L-54 -102 L-36 -90 L-28 -128 L-10 -98 L6 -134 L20 -98 L38 -124 L42 -92 L60 -104 L59 -62 Q42 -94 0 -94 Q-42 -94 -59 -62 Z"
+      }
+    },
+    {
+      "id": "hairBobBack",
+      "bone": "head",
+      "z": 8,
+      "slot": "hair",
+      "option": "bob",
+      "fill": "$hair",
+      "shape": {
+        "type": "path",
+        "d": "M-68 -50 Q-72 -127 0 -127 Q72 -127 68 -50 Q68 -8 54 2 L-54 2 Q-68 -8 -68 -50 Z"
+      }
+    },
+    {
+      "id": "hairBobFront",
+      "bone": "head",
+      "z": 13,
+      "slot": "hair",
+      "option": "bob",
+      "fill": "$hair",
+      "shape": {
+        "type": "path",
+        "d": "M-59 -62 Q-62 -118 0 -120 Q62 -118 59 -62 Q32 -88 0 -80 Q-32 -88 -59 -62 Z"
+      }
+    },
+    {
+      "id": "hairLongBack",
+      "bone": "head",
+      "z": 8,
+      "slot": "hair",
+      "option": "long",
+      "fill": "$hair",
+      "shape": {
+        "type": "path",
+        "d": "M-68 -50 Q-72 -129 0 -129 Q72 -129 68 -50 L76 46 Q60 66 40 44 L-40 44 Q-60 66 -76 46 Z"
+      }
+    },
+    {
+      "id": "hairLongFront",
+      "bone": "head",
+      "z": 13,
+      "slot": "hair",
+      "option": "long",
+      "fill": "$hair",
+      "shape": {
+        "type": "path",
+        "d": "M-59 -62 Q-62 -118 0 -120 Q62 -118 59 -62 Q32 -88 0 -80 Q-32 -88 -59 -62 Z"
+      }
+    },
+    {
+      "id": "hairBunFront",
+      "bone": "head",
+      "z": 13,
+      "slot": "hair",
+      "option": "bun",
+      "fill": "$hair",
+      "shape": {
+        "type": "path",
+        "d": "M-59 -58 Q-64 -120 0 -122 Q64 -120 59 -58 Q42 -94 0 -94 Q-42 -94 -59 -58 Z"
+      }
+    },
+    {
+      "id": "hairBunKnot",
+      "bone": "head",
+      "z": 9,
+      "slot": "hair",
+      "option": "bun",
+      "fill": "$hair",
+      "shape": {
+        "type": "ellipse",
+        "cx": 0,
+        "cy": -132,
+        "rx": 26,
+        "ry": 21
+      }
+    },
+    {
+      "id": "glassesL",
+      "bone": "head",
+      "z": 14,
+      "slot": "accessory",
+      "option": "glasses",
+      "stroke": "$accent",
+      "lw": 5,
+      "shape": {
+        "type": "ellipse",
+        "cx": -22,
+        "cy": -52,
+        "rx": 18,
+        "ry": 19
+      }
+    },
+    {
+      "id": "glassesR",
+      "bone": "head",
+      "z": 14,
+      "slot": "accessory",
+      "option": "glasses",
+      "stroke": "$accent",
+      "lw": 5,
+      "shape": {
+        "type": "ellipse",
+        "cx": 22,
+        "cy": -52,
+        "rx": 18,
+        "ry": 19
+      }
+    },
+    {
+      "id": "glassesBridge",
+      "bone": "head",
+      "z": 14,
+      "slot": "accessory",
+      "option": "glasses",
+      "stroke": "$accent",
+      "lw": 5,
+      "shape": {
+        "type": "path",
+        "d": "M-4 -54 Q0 -58 4 -54"
+      }
+    },
+    {
+      "id": "hatDome",
+      "bone": "head",
+      "z": 15,
+      "slot": "accessory",
+      "option": "hat",
+      "fill": "$accent",
+      "shape": {
+        "type": "path",
+        "d": "M-62 -86 Q-64 -158 0 -158 Q64 -158 62 -86 Q0 -100 -62 -86 Z"
+      }
+    },
+    {
+      "id": "hatBand",
+      "bone": "head",
+      "z": 15,
+      "slot": "accessory",
+      "option": "hat",
+      "fill": "$accent",
+      "shape": {
+        "type": "rect",
+        "x": -64,
+        "y": -98,
+        "w": 128,
+        "h": 18,
+        "r": 9
+      }
+    },
+    {
+      "id": "bowL",
+      "bone": "head",
+      "z": 15,
+      "slot": "accessory",
+      "option": "bow",
+      "fill": "$accent",
+      "shape": {
+        "type": "path",
+        "d": "M-44 -110 L-72 -128 L-72 -92 Z"
+      }
+    },
+    {
+      "id": "bowR",
+      "bone": "head",
+      "z": 15,
+      "slot": "accessory",
+      "option": "bow",
+      "fill": "$accent",
+      "shape": {
+        "type": "path",
+        "d": "M-44 -110 L-16 -128 L-16 -92 Z"
+      }
+    },
+    {
+      "id": "bowKnot",
+      "bone": "head",
+      "z": 16,
+      "slot": "accessory",
+      "option": "bow",
+      "fill": "$accent",
+      "shape": {
+        "type": "ellipse",
+        "cx": -44,
+        "cy": -110,
+        "rx": 9,
+        "ry": 9
+      }
+    }
+  ],
+  "clips": {
+    "idle": {
+      "duration": 3.2,
+      "loop": true,
+      "ease": "smooth",
+      "tracks": {
+        "hips": {
+          "pos": [
+            [
+              0,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              1.6,
+              [
+                0,
+                3
+              ]
+            ],
+            [
+              3.2,
+              [
+                0,
+                0
+              ]
+            ]
+          ]
+        },
+        "torso": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              1.6,
+              1.2
+            ],
+            [
+              3.2,
+              0
+            ]
+          ]
+        },
+        "head": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              1.2,
+              -1.5
+            ],
+            [
+              2.4,
+              1.5
+            ],
+            [
+              3.2,
+              0
+            ]
+          ]
+        },
+        "armL": {
+          "rot": [
+            [
+              0,
+              5
+            ],
+            [
+              1.6,
+              7
+            ],
+            [
+              3.2,
+              5
+            ]
+          ]
+        },
+        "armR": {
+          "rot": [
+            [
+              0,
+              -5
+            ],
+            [
+              1.6,
+              -7
+            ],
+            [
+              3.2,
+              -5
+            ]
+          ]
+        },
+        "foreL": {
+          "rot": [
+            [
+              0,
+              4
+            ],
+            [
+              1.6,
+              8
+            ],
+            [
+              3.2,
+              4
+            ]
+          ]
+        },
+        "foreR": {
+          "rot": [
+            [
+              0,
+              -4
+            ],
+            [
+              1.6,
+              -8
+            ],
+            [
+              3.2,
+              -4
+            ]
+          ]
+        }
+      }
+    },
+    "walk": {
+      "duration": 0.9,
+      "loop": true,
+      "ease": "smooth",
+      "speed": 190,
+      "tracks": {
+        "hips": {
+          "pos": [
+            [
+              0,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.225,
+              [
+                0,
+                -9
+              ]
+            ],
+            [
+              0.45,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.675,
+              [
+                0,
+                -9
+              ]
+            ],
+            [
+              0.9,
+              [
+                0,
+                0
+              ]
+            ]
+          ]
+        },
+        "torso": {
+          "rot": [
+            [
+              0,
+              3
+            ],
+            [
+              0.45,
+              -3
+            ],
+            [
+              0.9,
+              3
+            ]
+          ]
+        },
+        "head": {
+          "rot": [
+            [
+              0,
+              -2
+            ],
+            [
+              0.45,
+              2
+            ],
+            [
+              0.9,
+              -2
+            ]
+          ]
+        },
+        "thighL": {
+          "rot": [
+            [
+              0,
+              26
+            ],
+            [
+              0.45,
+              -26
+            ],
+            [
+              0.9,
+              26
+            ]
+          ]
+        },
+        "shinL": {
+          "rot": [
+            [
+              0,
+              4
+            ],
+            [
+              0.225,
+              2
+            ],
+            [
+              0.45,
+              38
+            ],
+            [
+              0.675,
+              12
+            ],
+            [
+              0.9,
+              4
+            ]
+          ]
+        },
+        "thighR": {
+          "rot": [
+            [
+              0,
+              -26
+            ],
+            [
+              0.45,
+              26
+            ],
+            [
+              0.9,
+              -26
+            ]
+          ]
+        },
+        "shinR": {
+          "rot": [
+            [
+              0,
+              38
+            ],
+            [
+              0.225,
+              12
+            ],
+            [
+              0.45,
+              4
+            ],
+            [
+              0.675,
+              2
+            ],
+            [
+              0.9,
+              38
+            ]
+          ]
+        },
+        "armL": {
+          "rot": [
+            [
+              0,
+              -28
+            ],
+            [
+              0.45,
+              28
+            ],
+            [
+              0.9,
+              -28
+            ]
+          ]
+        },
+        "foreL": {
+          "rot": [
+            [
+              0,
+              12
+            ],
+            [
+              0.45,
+              30
+            ],
+            [
+              0.9,
+              12
+            ]
+          ]
+        },
+        "armR": {
+          "rot": [
+            [
+              0,
+              28
+            ],
+            [
+              0.45,
+              -28
+            ],
+            [
+              0.9,
+              28
+            ]
+          ]
+        },
+        "foreR": {
+          "rot": [
+            [
+              0,
+              -30
+            ],
+            [
+              0.45,
+              -12
+            ],
+            [
+              0.9,
+              -30
+            ]
+          ]
+        }
+      }
+    },
+    "run": {
+      "duration": 0.52,
+      "loop": true,
+      "ease": "smooth",
+      "speed": 420,
+      "tracks": {
+        "hips": {
+          "pos": [
+            [
+              0,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.13,
+              [
+                0,
+                -22
+              ]
+            ],
+            [
+              0.26,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.39,
+              [
+                0,
+                -22
+              ]
+            ],
+            [
+              0.52,
+              [
+                0,
+                0
+              ]
+            ]
+          ]
+        },
+        "torso": {
+          "rot": [
+            [
+              0,
+              12
+            ],
+            [
+              0.26,
+              8
+            ],
+            [
+              0.52,
+              12
+            ]
+          ]
+        },
+        "head": {
+          "rot": [
+            [
+              0,
+              -8
+            ],
+            [
+              0.26,
+              -4
+            ],
+            [
+              0.52,
+              -8
+            ]
+          ]
+        },
+        "thighL": {
+          "rot": [
+            [
+              0,
+              50
+            ],
+            [
+              0.26,
+              -50
+            ],
+            [
+              0.52,
+              50
+            ]
+          ]
+        },
+        "shinL": {
+          "rot": [
+            [
+              0,
+              10
+            ],
+            [
+              0.13,
+              6
+            ],
+            [
+              0.26,
+              80
+            ],
+            [
+              0.39,
+              30
+            ],
+            [
+              0.52,
+              10
+            ]
+          ]
+        },
+        "thighR": {
+          "rot": [
+            [
+              0,
+              -50
+            ],
+            [
+              0.26,
+              50
+            ],
+            [
+              0.52,
+              -50
+            ]
+          ]
+        },
+        "shinR": {
+          "rot": [
+            [
+              0,
+              80
+            ],
+            [
+              0.13,
+              30
+            ],
+            [
+              0.26,
+              10
+            ],
+            [
+              0.39,
+              6
+            ],
+            [
+              0.52,
+              80
+            ]
+          ]
+        },
+        "armL": {
+          "rot": [
+            [
+              0,
+              -55
+            ],
+            [
+              0.26,
+              55
+            ],
+            [
+              0.52,
+              -55
+            ]
+          ]
+        },
+        "foreL": {
+          "rot": [
+            [
+              0,
+              80
+            ],
+            [
+              0.26,
+              90
+            ],
+            [
+              0.52,
+              80
+            ]
+          ]
+        },
+        "armR": {
+          "rot": [
+            [
+              0,
+              55
+            ],
+            [
+              0.26,
+              -55
+            ],
+            [
+              0.52,
+              55
+            ]
+          ]
+        },
+        "foreR": {
+          "rot": [
+            [
+              0,
+              -90
+            ],
+            [
+              0.26,
+              -80
+            ],
+            [
+              0.52,
+              -90
+            ]
+          ]
+        }
+      }
+    },
+    "wave": {
+      "duration": 1.5,
+      "loop": false,
+      "ease": "smooth",
+      "overlay": true,
+      "tracks": {
+        "armR": {
+          "rot": [
+            [
+              0,
+              -5
+            ],
+            [
+              0.3,
+              -150
+            ],
+            [
+              0.5,
+              -165
+            ],
+            [
+              0.7,
+              -140
+            ],
+            [
+              0.9,
+              -165
+            ],
+            [
+              1.1,
+              -140
+            ],
+            [
+              1.5,
+              -5
+            ]
+          ]
+        },
+        "foreR": {
+          "rot": [
+            [
+              0,
+              -4
+            ],
+            [
+              0.3,
+              -10
+            ],
+            [
+              0.5,
+              -35
+            ],
+            [
+              0.7,
+              25
+            ],
+            [
+              0.9,
+              -35
+            ],
+            [
+              1.1,
+              25
+            ],
+            [
+              1.5,
+              -4
+            ]
+          ]
+        },
+        "head": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.5,
+              -5
+            ],
+            [
+              1.2,
+              -5
+            ],
+            [
+              1.5,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "talk": {
+      "duration": 2.4,
+      "loop": true,
+      "ease": "smooth",
+      "overlay": true,
+      "tracks": {
+        "head": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.4,
+              -3
+            ],
+            [
+              0.9,
+              3
+            ],
+            [
+              1.5,
+              -2
+            ],
+            [
+              2.0,
+              2
+            ],
+            [
+              2.4,
+              0
+            ]
+          ]
+        },
+        "armR": {
+          "rot": [
+            [
+              0,
+              -5
+            ],
+            [
+              0.5,
+              -40
+            ],
+            [
+              0.9,
+              -22
+            ],
+            [
+              1.4,
+              -55
+            ],
+            [
+              1.9,
+              -20
+            ],
+            [
+              2.4,
+              -5
+            ]
+          ]
+        },
+        "foreR": {
+          "rot": [
+            [
+              0,
+              -4
+            ],
+            [
+              0.5,
+              -50
+            ],
+            [
+              0.9,
+              -30
+            ],
+            [
+              1.4,
+              -62
+            ],
+            [
+              1.9,
+              -28
+            ],
+            [
+              2.4,
+              -4
+            ]
+          ]
+        },
+        "torso": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.9,
+              1.5
+            ],
+            [
+              1.9,
+              -1.5
+            ],
+            [
+              2.4,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "jump": {
+      "duration": 0.8,
+      "loop": false,
+      "ease": "smooth",
+      "overlay": true,
+      "tracks": {
+        "root": {
+          "pos": [
+            [
+              0,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.15,
+              [
+                0,
+                6
+              ]
+            ],
+            [
+              0.4,
+              [
+                0,
+                -90
+              ]
+            ],
+            [
+              0.65,
+              [
+                0,
+                4
+              ]
+            ],
+            [
+              0.8,
+              [
+                0,
+                0
+              ]
+            ]
+          ]
+        },
+        "hips": {
+          "pos": [
+            [
+              0,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.15,
+              [
+                0,
+                22
+              ]
+            ],
+            [
+              0.3,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.65,
+              [
+                0,
+                18
+              ]
+            ],
+            [
+              0.8,
+              [
+                0,
+                0
+              ]
+            ]
+          ]
+        },
+        "armL": {
+          "rot": [
+            [
+              0,
+              5
+            ],
+            [
+              0.15,
+              25
+            ],
+            [
+              0.4,
+              150
+            ],
+            [
+              0.8,
+              5
+            ]
+          ]
+        },
+        "armR": {
+          "rot": [
+            [
+              0,
+              -5
+            ],
+            [
+              0.15,
+              -25
+            ],
+            [
+              0.4,
+              -150
+            ],
+            [
+              0.8,
+              -5
+            ]
+          ]
+        },
+        "thighL": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.15,
+              30
+            ],
+            [
+              0.4,
+              10
+            ],
+            [
+              0.65,
+              25
+            ],
+            [
+              0.8,
+              0
+            ]
+          ]
+        },
+        "thighR": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.15,
+              -30
+            ],
+            [
+              0.4,
+              -10
+            ],
+            [
+              0.65,
+              -25
+            ],
+            [
+              0.8,
+              0
+            ]
+          ]
+        },
+        "shinL": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.15,
+              45
+            ],
+            [
+              0.4,
+              20
+            ],
+            [
+              0.65,
+              40
+            ],
+            [
+              0.8,
+              0
+            ]
+          ]
+        },
+        "shinR": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.15,
+              45
+            ],
+            [
+              0.4,
+              20
+            ],
+            [
+              0.65,
+              40
+            ],
+            [
+              0.8,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "shrug": {
+      "duration": 1.2,
+      "loop": false,
+      "ease": "smooth",
+      "overlay": true,
+      "tracks": {
+        "armL": {
+          "rot": [
+            [
+              0,
+              5
+            ],
+            [
+              0.25,
+              30
+            ],
+            [
+              0.85,
+              30
+            ],
+            [
+              1.2,
+              5
+            ]
+          ]
+        },
+        "armR": {
+          "rot": [
+            [
+              0,
+              -5
+            ],
+            [
+              0.25,
+              -30
+            ],
+            [
+              0.85,
+              -30
+            ],
+            [
+              1.2,
+              -5
+            ]
+          ]
+        },
+        "foreL": {
+          "rot": [
+            [
+              0,
+              4
+            ],
+            [
+              0.25,
+              60
+            ],
+            [
+              0.85,
+              60
+            ],
+            [
+              1.2,
+              4
+            ]
+          ]
+        },
+        "foreR": {
+          "rot": [
+            [
+              0,
+              -4
+            ],
+            [
+              0.25,
+              -60
+            ],
+            [
+              0.85,
+              -60
+            ],
+            [
+              1.2,
+              -4
+            ]
+          ]
+        },
+        "head": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.25,
+              8
+            ],
+            [
+              0.85,
+              8
+            ],
+            [
+              1.2,
+              0
+            ]
+          ]
+        },
+        "hips": {
+          "pos": [
+            [
+              0,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.25,
+              [
+                0,
+                6
+              ]
+            ],
+            [
+              0.85,
+              [
+                0,
+                6
+              ]
+            ],
+            [
+              1.2,
+              [
+                0,
+                0
+              ]
+            ]
+          ]
+        }
+      }
+    },
+    "nod": {
+      "duration": 0.9,
+      "loop": false,
+      "ease": "smooth",
+      "overlay": true,
+      "tracks": {
+        "head": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.2,
+              12
+            ],
+            [
+              0.45,
+              0
+            ],
+            [
+              0.65,
+              12
+            ],
+            [
+              0.9,
+              0
+            ]
+          ]
+        },
+        "torso": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.2,
+              3
+            ],
+            [
+              0.45,
+              0
+            ],
+            [
+              0.65,
+              3
+            ],
+            [
+              0.9,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "shake_head": {
+      "duration": 1.0,
+      "loop": false,
+      "ease": "smooth",
+      "overlay": true,
+      "tracks": {
+        "head": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.15,
+              -12
+            ],
+            [
+              0.35,
+              12
+            ],
+            [
+              0.55,
+              -12
+            ],
+            [
+              0.75,
+              12
+            ],
+            [
+              1.0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    "cheer": {
+      "duration": 1.6,
+      "loop": false,
+      "ease": "smooth",
+      "overlay": true,
+      "tracks": {
+        "armL": {
+          "rot": [
+            [
+              0,
+              5
+            ],
+            [
+              0.25,
+              155
+            ],
+            [
+              0.55,
+              140
+            ],
+            [
+              0.85,
+              155
+            ],
+            [
+              1.15,
+              140
+            ],
+            [
+              1.6,
+              5
+            ]
+          ]
+        },
+        "armR": {
+          "rot": [
+            [
+              0,
+              -5
+            ],
+            [
+              0.25,
+              -155
+            ],
+            [
+              0.55,
+              -140
+            ],
+            [
+              0.85,
+              -155
+            ],
+            [
+              1.15,
+              -140
+            ],
+            [
+              1.6,
+              -5
+            ]
+          ]
+        },
+        "hips": {
+          "pos": [
+            [
+              0,
+              [
+                0,
+                0
+              ]
+            ],
+            [
+              0.25,
+              [
+                0,
+                -8
+              ]
+            ],
+            [
+              0.5,
+              [
+                0,
+                4
+              ]
+            ],
+            [
+              0.75,
+              [
+                0,
+                -8
+              ]
+            ],
+            [
+              1.0,
+              [
+                0,
+                4
+              ]
+            ],
+            [
+              1.6,
+              [
+                0,
+                0
+              ]
+            ]
+          ]
+        },
+        "head": {
+          "rot": [
+            [
+              0,
+              0
+            ],
+            [
+              0.4,
+              -5
+            ],
+            [
+              0.8,
+              5
+            ],
+            [
+              1.2,
+              -5
+            ],
+            [
+              1.6,
+              0
+            ]
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Filmly Studio</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%2314151a%27/%3E%3Cpath d=%27M24 16l26 16-26 16z%27 fill=%27%23ffb84d%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="logo">▶</span> Filmly <b>Studio</b></div>
+    <select id="filmSelect" title="Open a film from /films"></select>
+    <button id="btnNew">New</button>
+    <button id="btnOpen">Open .fly…</button>
+    <button id="btnSave">Save .fly</button>
+    <span class="spacer"></span>
+    <button id="btnClaude" title="Copy the language guide, asset list and your script to paste into Claude">Copy context for Claude</button>
+    <input type="file" id="fileInput" accept=".fly,.txt" hidden>
+  </header>
+
+  <main class="layout">
+    <aside class="panel assets" id="assets">
+      <nav class="tabs" id="assetTabs"></nav>
+      <div class="assetList" id="assetList"></div>
+    </aside>
+
+    <section class="stage">
+      <div class="screen"><canvas id="preview" width="1280" height="720"></canvas><div class="overlay" id="overlay"></div></div>
+      <div class="transport">
+        <button id="btnPlay" class="primary">▶ Play</button>
+        <input type="range" id="scrub" min="0" max="1000" value="0">
+        <span id="timeLabel" class="mono">0:00.00 / 0:00.00</span>
+      </div>
+      <details class="export" open>
+        <summary>Export MP4</summary>
+        <div class="grid">
+          <label>Resolution
+            <select id="expRes">
+              <option value="1280">720p (1280×720)</option>
+              <option value="1920" selected>1080p (1920×1080)</option>
+              <option value="2560">1440p (2560×1440)</option>
+              <option value="3840">4K (3840×2160)</option>
+              <option value="7680">8K (7680×4320)</option>
+            </select>
+          </label>
+          <label>Frame rate
+            <select id="expFps">
+              <option value="0" selected>As written in film</option>
+              <option>24</option><option>30</option><option>60</option><option>120</option><option>240</option>
+            </select>
+          </label>
+          <label>Quality
+            <select id="expQuality"><option value="draft">Draft</option><option value="high" selected>High</option><option value="max">Maximum</option></select>
+          </label>
+          <label>Codec
+            <select id="expCodec"><option value="auto" selected>Auto</option><option value="avc">H.264</option><option value="hevc">HEVC (H.265)</option></select>
+          </label>
+          <label>Range
+            <select id="expRange"><option value="full" selected>Whole film</option><option value="5">First 5 seconds (test)</option></select>
+          </label>
+          <div class="go"><button id="btnExport" class="primary">Export MP4</button><button id="btnCancel" hidden>Cancel</button></div>
+        </div>
+        <div class="bar"><div id="expBar"></div></div>
+        <div id="expStatus" class="mono small"></div>
+      </details>
+    </section>
+
+    <section class="panel code">
+      <div class="editorWrap">
+        <div class="gutter mono" id="gutter"></div>
+        <textarea id="editor" class="mono" spellcheck="false" wrap="off"></textarea>
+      </div>
+      <div class="problems" id="problems"></div>
+    </section>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
