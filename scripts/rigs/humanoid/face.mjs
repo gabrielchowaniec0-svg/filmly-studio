@@ -3,7 +3,7 @@
 //
 // 3/4-view layout in head-bone space (origin = top of neck):
 //   cranium top y -130 · back of head x -62 · cheek front x 66 · chin (≈18, 0)
-//   near eye centre (-10,-66) · far eye centre (30,-65.5) · nose tip (≈39,-42) · mouth centre (≈22,-28)
+//   near eye centre (-10,-66) · far eye centre (30,-65.5) · nose tip (≈39,-45) · mouth centre (≈22,-28)
 //   ear on the back side, centre (≈-50,-62), front edge tucked into the head at x ≈ -40
 // Light comes from the front (screen-right): the back of the head and the near side of the nose are shaded.
 export const slots = {
@@ -104,10 +104,9 @@ export function addFace(ctx) {
   P('eyeClosedF', 'head', 85, path('M 19.5 -65 Q 30 -53 41 -65 Q 30 -57 19.5 -65 Z'), { fill: '$outline', lw: 2.8, slot: 'eyes', option: 'closed' });
 
   // ---- nose ----------------------------------------------------------------------------------
-  // A soft button nose between the eyes, pointing forward: shaded near side, small underside line, tip highlight.
-  P('nose', 'head', 79.5, path('M 23 -56 C 27 -51 33 -48.5 37 -47 C 41 -45.5 41.5 -40.5 38 -39 C 34.5 -37.5 28 -38 24.5 -39.5 C 20.5 -41.5 19.5 -48 23 -56 Z'), { fill: '$skin-14', ...NOSTROKE });
-  P('noseLine', 'head', 87.1, path('M 27 -40.5 C 30 -38.6 35 -38.6 38 -41'), { fill: null, lw: 2.5 });
-  P('noseGlint', 'head', 87.2, ell(34.5, -44, 2.6, 1.7, 25), { fill: '#ffffff', alpha: 0.4, ...NOSTROKE });
+  // Button nose: a soft warm shadow on the cheek side only, plus one clean tip/nostril curve.
+  P('nose', 'head', 79.5, path('M 23.5 -58 C 21 -52 20.5 -46.5 23.5 -43.5 C 26.5 -40.8 32 -40.6 36 -42 C 31 -43 27.2 -45.5 26 -49.5 C 25.3 -52.5 24.6 -55.5 23.5 -58 Z'), { fill: '$skin-20', alpha: 0.5, ...NOSTROKE });
+  P('noseLine', 'head', 87.1, path('M 28.5 -43.6 C 31.5 -41.4 36.5 -41.3 39.2 -43.8 C 40.8 -45.3 40.6 -47 39.2 -48'), { fill: null, lw: 2.6 });
 
   // ---- facial hair (under the mouth so lips stay readable) ----------------------------------------
   P('beard', 'head', 88, path('M -45 -52 C -46 -20 -20 10 12 13 C 40 15 60 -8 63 -44 C 58 -34 52 -26 44 -21 C 40 -30 32 -35 22 -35 C 12 -35 6 -29 4 -21 C -14 -24 -34 -34 -45 -52 Z'), { ...HAIR, slot: 'facial', option: 'beard' });
