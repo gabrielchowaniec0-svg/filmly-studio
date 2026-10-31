@@ -505,7 +505,7 @@ clips.thumbs_up = gesture({
     [1.1, { N: { w: [70, -90], a: 186, elbow: 'back' }, torso: 0, head: -3 }],
     [1.45, at0],
   ),
-  slots: { handN: K([0, 'open'], [0.16, 'point'], [1.25, 'open']), mouth: K([0, 'grin'], [1.35, null]), eyes: K([0, null], [0.3, 'happy'], [1.2, null]), brows: K([0, 'happy'], [1.35, null]) },
+  slots: { handN: K([0, 'open'], [0.16, 'thumbsup'], [1.25, 'open']), mouth: K([0, 'grin'], [1.35, null]), eyes: K([0, null], [0.3, 'happy'], [1.2, null]), brows: K([0, 'happy'], [1.35, null]) },
 });
 clips.beckon = gesture({
   holdAt: 0.9,

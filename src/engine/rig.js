@@ -153,7 +153,7 @@ function prep(rig) {
     const byId = {};
     rig.parts.forEach((p) => (byId[p.id] = p));
     const sorted = rig.parts.map((p, i) => ({ p, i })).sort((a, b) => (a.p.z - b.p.z) || (a.i - b.i)).map((x) => x.p);
-    s = { byId, sorted };
+    s = { byId, sorted, visCache: new Map() };
     prepCache.set(rig, s);
   }
   return s;
@@ -193,10 +193,17 @@ export function drawRig(ctx, rig, character, pose, face, placement) {
   const mats = boneMatrices(rig, pose, placement, build);
   const opts = activeOptions(rig, character, face, pose.__slots);
   const palette = character.palette;
-  const { byId, sorted } = prep(rig);
+  const { byId, sorted, visCache } = prep(rig);
   const defStroke = rig.style?.stroke, defLw = rig.style?.lw;
-  for (const part of sorted) {
-    if (!partVisible(part, opts)) continue;
+  // the rig holds every option of every slot; only ~15% is visible for one look, so cache that list
+  const key = JSON.stringify(opts);
+  let visible = visCache.get(key);
+  if (!visible) {
+    visible = sorted.filter((p) => partVisible(p, opts));
+    if (visCache.size > 400) visCache.clear();
+    visCache.set(key, visible);
+  }
+  for (const part of visible) {
     const m = partMatrix(mats, build, part);
     ctx.save();
     if (part.clip) {

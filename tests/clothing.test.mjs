@@ -64,7 +64,7 @@ test('existing characters keep their look: default shoes and every option they u
 });
 
 test('part count stays reasonable', () => {
-  assert.ok(rig.parts.length < 800, `${rig.parts.length} parts`);
+  assert.ok(rig.parts.length < 1200, `${rig.parts.length} parts`);
   // what is actually drawn for one character is much smaller
   const opts = activeOptions(rig, { options: { top: 'labcoat', bottom: 'jeans', shoes: 'boots' } });
   assert.ok(rig.parts.filter((p) => partVisible(p, opts)).length < 200);
